@@ -69,5 +69,5 @@ project-folder/
 ## Acknowledgments
 
 - [YouTube Data API v3 Documentation](https://developers.google.com/youtube/v3/docs).
-- ChatGPT 4o for writing all of the javascript and most of this readme file.
+- ChatGPT 4o for writing all of the javascript, php, and most of this readme file.
 - Inspiration from http://youtube.nestharion.de/ which hasn't worked in a few years now probably.
