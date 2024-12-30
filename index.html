@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" type="image/png" href="ytplr.svg">
+	<link rel="stylesheet" href="ytplr.css">
+	<title>Reverse YouTube Playlist</title>
+</head>
+<body>
+	<header>
+		<h1>YouTube Playlist Reverser</h1>
+		<div class="controls">
+			<div id="two">
+				<label for="playlistURL">Enter Playlist URL:</label>
+				<input type="text" id="playlistURL" placeholder="https://www.youtube.com/playlist?list=...">
+				<button id="loadPlaylist" type="submit">Load Playlist</button>
+			</div>
+			<div id="sortingOptions">
+				<label for="sortOrder">Sort Playlist By:</label>
+				<select id="sortOrder">
+					<!-- <option value="reverse">Reverse Order</option> -->
+					<option value="uploadOldest" selected>Upload Date (Oldest First)</option>
+					<option value="uploadNewest">Upload Date (Newest First)</option>
+					<option value="titleAsc">Video Title (A-Z)</option>
+					<option value="titleDesc">Video Title (Z-A)</option>
+				</select>
+			</div>
+			<button id="resetPage">reset</button>
+		</div>
+	</header>
+	<main>
+		<div id="playerContainer" class="left">
+			<div id="player"></div>
+			<div class="description"></div>
+		</div>
+		<div class="right">
+			<div class="controls-playlist">
+				<button id="prevVideo" disabled>&lt;</button>
+				<button id="scrollToCurrent" type="button">Scroll to Current Video</button>
+				<button id="nextVideo" disabled>&gt;</button>
+			</div>
+			<ul id="playlist"></ul>
+		</div>
+	</main>
+	<footer>
+		<p>&copy; VSXD 2024.12.30</p>
+	</footer>
+	<script>
+		// reload page
+		document.getElementById('resetPage').addEventListener('click', (e) => {
+			e.preventDefault(); // Prevent default link behavior
+
+			// Reset the URL by removing all parameters
+			const baseUrl = window.location.origin + window.location.pathname;
+			window.history.pushState({}, '', baseUrl);
+
+			// Reload the page
+			window.location.reload();
+		});
+
+		// get stuff from youtube and do things with them
+		let player; // Global player variable
+		let videoQueue = [];
+		let currentIndex = 0;
+		let playlistId = ''; // Declare a global variable for playlistId
+
+		// function to update video description
+		function updateDescrip(){
+			const descriptionDiv = document.querySelector('.description');
+			if (descriptionDiv && videoQueue[currentIndex].description) {
+				descriptionDiv.textContent = videoQueue[currentIndex].description; // Set the description text
+			} else {
+				descriptionDiv.textContent = 'No description found!';
+			}
+		}
+
+		// Function to load a video by ID and update the player and URL
+		function playVideo(videoId, playlistId, index) {
+			currentIndex = index; // Update the current index
+
+			// Update URL without reloading the page
+			const newUrl = `${window.location.pathname}?v=${videoId}&list=${playlistId}&index=${index}`;
+			window.history.pushState({}, '', newUrl);
+
+			// Load the video in the player
+			if (player) {
+				player.loadVideoById(videoId);
+			} else {
+				initializePlayer(videoId);
+			}
+
+			highlightCurrentVideo(); // Highlight the current video in the list
+			// Update the description div with the current video's description
+			updateDescrip();
+		}
+
+		// On page load, parse URL parameters and load the corresponding video
+		function handleInitialLoad() {
+			const params = new URLSearchParams(window.location.search);
+			const videoId = params.get('v');
+			const playlistId = params.get('list');
+			const index = parseInt(params.get('index'), 10);
+
+			if (playlistId) {
+			        fetchPlaylistVideos(playlistId).then((videos) => {
+			            videoQueue = videos; // Store the playlist
+			            generatePlaylistLinks(videoQueue, playlistId);
+
+			            if (videoId && !isNaN(index)) {
+			                currentIndex = index; // Set the current index based on the URL parameter
+			                playVideo(videoQueue[currentIndex].videoId, playlistId, currentIndex); // Play the specified video
+			            } else {
+			                // If no specific video is provided, play the first video by default
+			                currentIndex = 0;
+			                playVideo(videoQueue[currentIndex].videoId, playlistId, currentIndex);
+			            }
+			            updateControlButtons(); // Update button states after loading
+			        });
+			    }
+			}
+
+		// Fetch playlist videos and reverse their order
+		async function fetchPlaylistVideos(playlistId) {
+			let videos = [];
+			let nextPageToken = '';
+			try {
+				do {
+					const response = await fetch(`ytplr.php?playlistId=${playlistId}&pageToken=${nextPageToken}`);
+					const data = await response.json();
+
+					if (!response.ok || data.error) {
+						throw new Error(data.error || `API request failed with status ${response.status}`);
+					}
+
+					if (data.items) {
+						videos = videos.concat(data.items.map(item => ({
+							videoId: item.snippet.resourceId.videoId,
+							title: item.snippet.title,
+							description: item.snippet.description, // Add description
+							position: item.snippet.position, // Add position
+							publishedAt: new Date(item.snippet.publishedAt), // Add upload date
+							channelTitle: item.snippet.channelTitle, // Add channel title
+							// default (120x90), medium (320x180), high (480x360), standard (640x480), and maxres (unscaled), are the thumbnail options here but not all of them are guaranteed to exist for every video.
+							// Use the high-quality thumbnail if available, otherwise fallback to default
+							thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default.url,
+						})));
+					}
+					nextPageToken = data.nextPageToken || '';
+				} while (nextPageToken);
+			} catch (error) {
+				console.error('Error fetching playlist videos:', error);
+			}
+			return videos.reverse(); // Reverse the video order
+		}
+
+		// playlist sorting logic
+		function sortPlaylist(videos, sortOrder) {
+			switch (sortOrder) {
+				case "uploadOldest":
+					return videos.sort((a, b) => a.publishedAt - b.publishedAt); // Oldest first
+				case "uploadNewest":
+					return videos.sort((a, b) => b.publishedAt - a.publishedAt); // Newest first
+				case "titleAsc":
+					return videos.sort((a, b) => a.title.localeCompare(b.title)); // A-Z
+				case "titleDesc":
+					return videos.sort((a, b) => b.title.localeCompare(a.title)); // Z-A
+				case "reverse":
+				default:
+					return videos.reverse(); // Default: reverse order
+			}
+			// Update the description div with the current video's description
+			updateDescrip();
+		}
+		document.getElementById('sortOrder').addEventListener('change', () => {
+			const sortOrder = document.getElementById('sortOrder').value;
+			const sortedVideos = sortPlaylist(videoQueue.slice(), sortOrder); // Clone the array before sorting
+			generatePlaylistLinks(sortedVideos, playlistId); // Regenerate playlist links
+			currentIndex = 0; // Reset to the first video
+			playVideo(sortedVideos[currentIndex].videoId, playlistId, currentIndex); // Play the first video in the sorted order
+		});
+
+
+		// Initialize the YouTube player
+		function initializePlayer(videoId) {
+			player = new YT.Player('player', {
+				height: '315',
+				width: '560',
+				videoId: videoId,
+				playerVars: { autoplay: 1, rel: 0 },
+				events: {
+					'onStateChange': onPlayerStateChange,
+				},
+			});
+		}
+
+		// Handle video end and load the next video
+		function onPlayerStateChange(event) {
+			if (event.data === YT.PlayerState.ENDED) {
+				currentIndex++;
+				if (currentIndex < videoQueue.length) {
+					const nextVideo = videoQueue[currentIndex];
+					playVideo(nextVideo.videoId, null, currentIndex); // Play the next video
+				} else {
+					alert('Playlist finished!');
+				}
+			}
+			// Update the description div with the current video's description
+			updateDescrip();
+		}
+
+		// Generate clickable video links in playlist
+		function generatePlaylistLinks(videos, playlistId) {
+			const playlistContainer = document.getElementById('playlist');
+			const playlistControls = document.querySelector('.controls-playlist');
+			playlistContainer.innerHTML = videos
+				.map((video, index) =>
+					`<li>
+						<a href="#" data-index="${index}" data-video-id="${video.videoId}" class="${index === currentIndex ? 'current-video' : ''}">
+							<img src="${video.thumbnail}" alt="Thumbnail for ${video.title}">
+							${video.title}
+						</a>
+					</li>`
+				)
+				.join('');
+				playlistControls.style.display = "flex";
+
+			// Add click event listeners to links
+			document.querySelectorAll('#playlist a').forEach(link => {
+				link.addEventListener('click', (e) => {
+					e.preventDefault();
+					const index = parseInt(link.dataset.index, 10);
+					const videoId = link.dataset.videoId;
+					currentIndex = index;
+					playVideo(videoId, playlistId, index); // Play the selected video
+					// Update the description div with the current video's description
+					updateDescrip();
+					// Update buttons after manual selection
+					updateControlButtons();
+				});
+			});
+		}
+
+
+		// Highlight the currently playing video in the list
+		function highlightCurrentVideo() {
+			const links = document.querySelectorAll('#playlist a');
+			links.forEach(link => link.classList.remove('current-video')); // Remove highlight from all links
+			const currentLink = links[currentIndex];
+			if (currentLink) {
+				currentLink.classList.add('current-video'); // Highlight the current video link
+				currentLink.scrollIntoView({ behavior: 'smooth', block: 'center' }); // Scroll to the current video
+			}
+		}
+
+		// Scroll to the current video (button)
+		document.getElementById('scrollToCurrent').addEventListener('click', () => {
+		    const currentLink = document.querySelector('#playlist a.current-video');
+		    if (currentLink) {
+		        currentLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		    } else {
+		        alert('No current video selected!');
+		    }
+		});
+
+		// Function to play the previous video
+		function playPreviousVideo() {
+		    if (currentIndex > 0) {
+		        currentIndex--; // Move to the previous video
+		        const previousVideoId = videoQueue[currentIndex].videoId;
+		        playVideo(previousVideoId, null, currentIndex); // Play the previous video
+		    }
+		    updateControlButtons(); // Update button states
+		}
+
+		// Function to play the next video
+		function playNextVideo() {
+		    if (currentIndex < videoQueue.length - 1) {
+		        currentIndex++; // Move to the next video
+		        const nextVideoId = videoQueue[currentIndex].videoId;
+		        playVideo(nextVideoId, null, currentIndex); // Play the next video
+		    }
+		    updateControlButtons(); // Update button states
+		}
+
+		// Function to update prev/next button states (disable/enable)
+		function updateControlButtons() {
+		    const prevButton = document.getElementById('prevVideo');
+		    const nextButton = document.getElementById('nextVideo');
+
+		    // Disable or enable buttons based on currentIndex
+		    prevButton.disabled = currentIndex === 0; // Disable if no previous video
+		    nextButton.disabled = currentIndex === videoQueue.length - 1; // Disable if no next video
+		}
+
+		// Add event listeners for the pev/next buttons
+		document.getElementById('prevVideo').addEventListener('click', playPreviousVideo);
+		document.getElementById('nextVideo').addEventListener('click', playNextVideo);
+
+
+		// Load the playlist on button click
+		function loadPlaylist() {
+			const playlistURL = document.getElementById('playlistURL').value;
+			playlistId = new URL(playlistURL).searchParams.get('list'); // Set the global playlistId
+			if (!playlistId) {
+				alert('Invalid playlist URL!');
+				return;
+			}
+
+			fetchPlaylistVideos(playlistId).then((videos) => {
+				videoQueue = videos; // Store the reversed playlist
+				if (videoQueue.length > 0) {
+					currentIndex = 0;
+					// Start playing the first video
+					playVideo(videoQueue[currentIndex].videoId, playlistId, currentIndex);
+					updateControlButtons();
+					generatePlaylistLinks(videoQueue, playlistId); // Generate playlist links
+				} else {
+					alert('No videos found in the playlist!');
+				}
+			});
+		}
+
+
+		// Add event listeners for button click and Enter key
+		document.getElementById('loadPlaylist').addEventListener('click', loadPlaylist);
+		document.getElementById('playlistURL').addEventListener('keydown', (event) => {
+			if (event.key === 'Enter') {
+				loadPlaylist();
+			}
+		});
+
+		// Handle page load
+		document.addEventListener('DOMContentLoaded', handleInitialLoad);
+	</script>
+
+	<script src="https://www.youtube.com/iframe_api"></script>
+
+
+	<style>
+		.current-video {
+			font-weight: bold;
+			color: blue;
+		}
+	</style>
+</body>
+</html>
