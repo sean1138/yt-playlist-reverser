@@ -1,19 +1,18 @@
 # YouTube Playlist Reverser
 
-A web-based tool that allows users to load YouTube playlists and customize their playback order. This tool supports reversing the playlist order, sorting by upload date, and more. It also provides various features to enhance the playlist-watching experience.
+A web-based tool that allows users to load YouTube playlists and change the playback order. This tool sorts the playlist videos by upload date, video title, ascending and descending.
 
 ## Features
 
-- **Reverse Order:** Default option to reverse the order of the playlist videos.
 - **Custom Sorting Options:**
-  - Upload date (oldest first).
-  - Upload date (newest first).
-  - Video title (ascending).
-  - Video title (descending).
+  - Upload Date (Oldest First) [Default].
+  - Upload Date (Newest First).
+  - Video Title (A-Z).
+  - Video Title (Z-A).
 - **Video Description Display:** Displays the description of the currently playing video.
 - **Scroll to Current Video:** Automatically scrolls the current video in the playlist into view, with button to manually scroll to it as well.
 - **Next/Previous Video Navigation:** Buttons to move to the next or previous video in the playlist.
-- **Shareable Links:** The page URL preserves the playlist and the currently selected video, so the link for what you're watching can be shared and loaded directly.
+- **Shareable Links:** The page URL preserves the playlist ID and the currently selected video ID, so the link for what you're watching can be copied from your browser's address bar, shared and loaded directly.
 
 ## Installation
 
@@ -40,12 +39,12 @@ A web-based tool that allows users to load YouTube playlists and customize their
 
 ## Usage
 
-1. Paste a YouTube playlist URL into the input field and click "Load Playlist" button or hit the enter key.
+1. Paste a YouTube playlist URL into the text input box and click "Load Playlist" button or hit the enter key.
 2. Use the dropdown menu to select your desired playback order:
-   - Upload date (oldest first) [default].
-   - Upload date (newest first).
-   - Video title (ascending).
-   - Video title (descending).
+   - Upload Date (Oldest First) [Default].
+   - Upload Date (Newest First).
+   - Video Title (A-Z).
+   - Video Title (Z-A).
 3. Click on any video in the playlist to start playback.
 4. Use the Next/Previous buttons to navigate through the playlist.
 5. Click the "Scroll to Current Video" button to quickly bring the currently playing video into view within the playlist if you've scrolled away from it.
