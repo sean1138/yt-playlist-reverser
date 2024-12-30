@@ -194,6 +194,9 @@ input, select, button{
 	background-color: var(--foreground1);
 	color: var(--background1);
 }
+button{
+	text-transform: capitalize;
+}
 button:hover, button:focus, input:focus, select:focus{
 	background-color:var(--foreground1l);
 }
