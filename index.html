@@ -27,6 +27,8 @@
 				</select>
 			</div>
 			<button id="resetPage">reset</button>
+			<button id="oma" data-modal="modal-about">about</button>
+			<button id="omh" data-modal="modal-help">help</button>
 		</div>
 	</header>
 	<main>
@@ -44,10 +46,61 @@
 		</div>
 	</main>
 	<footer>
-		<p>&copy; VSXD 2024.12.30</p>
+		<p>&copy; 2024.12.30</p>
 	</footer>
+	<dialog id="modal-about">
+		<h2>About</h2>
+		<p>i wanted a way to sort a youtube playist chronologically oldest first so used chatgpt 4o to do the heavy lifting on the javascript and php. Inspired by this old <a href="http://youtube.nestharion.de/" target="_blank" rel="noopener">Youtube Jukebox</a> that hasn't worked for a few years probably.</p>
+		<button class="close-modal" data-modal-close>close</button>
+	</dialog>
+	<dialog id="modal-help">
+		<h2>Help</h2>
+		<ol>
+			<li>Copy a playlist URL from youtube</li>
+			<li>Paste URL into text input</li>
+			<li>Hit the enter key or hit the 'Load Playlist' button</li>
+			<li>Enjoy</li>
+		</ol>
+		<button class="close-modal" data-modal-close>close</button>
+	</dialog>
+
 	<script>
-		// reload page
+		// Event delegation for opening modals
+		document.addEventListener("click", (event) => {
+			const openButton = event.target.closest("[data-modal]");
+			if (openButton) {
+				const modalId = openButton.getAttribute("data-modal");
+				const modal = document.querySelector(`#${modalId}`);
+				if (modal) {
+					modal.showModal();
+				}
+			}
+			// Event delegation for closing modals
+			const closeButton = event.target.closest("[data-modal-close]");
+			if (closeButton) {
+				const modal = closeButton.closest("dialog");
+				if (modal) {
+					modal.close();
+				}
+			}
+		});
+		// Close modal when clicking the backdrop
+		document.querySelectorAll("dialog").forEach((dialog) => {
+			dialog.addEventListener("click", (event) => {
+				const rect = dialog.getBoundingClientRect();
+				// Check if the click is outside the dialog content
+				if (
+					event.clientX < rect.left ||
+					event.clientX > rect.right ||
+					event.clientY < rect.top ||
+					event.clientY > rect.bottom
+				) {
+					dialog.close();
+				}
+			});
+		});
+
+		// reload/reset page
 		document.getElementById('resetPage').addEventListener('click', (e) => {
 			e.preventDefault(); // Prevent default link behavior
 
@@ -68,6 +121,7 @@
 		// function to update video description
 		function updateDescrip(){
 			const descriptionDiv = document.querySelector('.description');
+			descriptionDiv.style.display = "block";
 			if (descriptionDiv && videoQueue[currentIndex].description) {
 				descriptionDiv.textContent = videoQueue[currentIndex].description; // Set the description text
 			} else {
@@ -103,22 +157,22 @@
 			const index = parseInt(params.get('index'), 10);
 
 			if (playlistId) {
-			        fetchPlaylistVideos(playlistId).then((videos) => {
-			            videoQueue = videos; // Store the playlist
-			            generatePlaylistLinks(videoQueue, playlistId);
+				fetchPlaylistVideos(playlistId).then((videos) => {
+					videoQueue = videos; // Store the playlist
+					generatePlaylistLinks(videoQueue, playlistId);
 
-			            if (videoId && !isNaN(index)) {
-			                currentIndex = index; // Set the current index based on the URL parameter
-			                playVideo(videoQueue[currentIndex].videoId, playlistId, currentIndex); // Play the specified video
-			            } else {
-			                // If no specific video is provided, play the first video by default
-			                currentIndex = 0;
-			                playVideo(videoQueue[currentIndex].videoId, playlistId, currentIndex);
-			            }
-			            updateControlButtons(); // Update button states after loading
-			        });
-			    }
+					if (videoId && !isNaN(index)) {
+							currentIndex = index; // Set the current index based on the URL parameter
+							playVideo(videoQueue[currentIndex].videoId, playlistId, currentIndex); // Play the specified video
+					} else {
+							// If no specific video is provided, play the first video by default
+							currentIndex = 0;
+							playVideo(videoQueue[currentIndex].videoId, playlistId, currentIndex);
+					}
+					updateControlButtons(); // Update button states after loading
+				});
 			}
+		}
 
 		// Fetch playlist videos and reverse their order
 		async function fetchPlaylistVideos(playlistId) {
@@ -255,42 +309,42 @@
 
 		// Scroll to the current video (button)
 		document.getElementById('scrollToCurrent').addEventListener('click', () => {
-		    const currentLink = document.querySelector('#playlist a.current-video');
-		    if (currentLink) {
-		        currentLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
-		    } else {
-		        alert('No current video selected!');
-		    }
+				const currentLink = document.querySelector('#playlist a.current-video');
+				if (currentLink) {
+						currentLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				} else {
+						alert('No current video selected!');
+				}
 		});
 
 		// Function to play the previous video
 		function playPreviousVideo() {
-		    if (currentIndex > 0) {
-		        currentIndex--; // Move to the previous video
-		        const previousVideoId = videoQueue[currentIndex].videoId;
-		        playVideo(previousVideoId, null, currentIndex); // Play the previous video
-		    }
-		    updateControlButtons(); // Update button states
+				if (currentIndex > 0) {
+						currentIndex--; // Move to the previous video
+						const previousVideoId = videoQueue[currentIndex].videoId;
+						playVideo(previousVideoId, null, currentIndex); // Play the previous video
+				}
+				updateControlButtons(); // Update button states
 		}
 
 		// Function to play the next video
 		function playNextVideo() {
-		    if (currentIndex < videoQueue.length - 1) {
-		        currentIndex++; // Move to the next video
-		        const nextVideoId = videoQueue[currentIndex].videoId;
-		        playVideo(nextVideoId, null, currentIndex); // Play the next video
-		    }
-		    updateControlButtons(); // Update button states
+				if (currentIndex < videoQueue.length - 1) {
+						currentIndex++; // Move to the next video
+						const nextVideoId = videoQueue[currentIndex].videoId;
+						playVideo(nextVideoId, null, currentIndex); // Play the next video
+				}
+				updateControlButtons(); // Update button states
 		}
 
 		// Function to update prev/next button states (disable/enable)
 		function updateControlButtons() {
-		    const prevButton = document.getElementById('prevVideo');
-		    const nextButton = document.getElementById('nextVideo');
+				const prevButton = document.getElementById('prevVideo');
+				const nextButton = document.getElementById('nextVideo');
 
-		    // Disable or enable buttons based on currentIndex
-		    prevButton.disabled = currentIndex === 0; // Disable if no previous video
-		    nextButton.disabled = currentIndex === videoQueue.length - 1; // Disable if no next video
+				// Disable or enable buttons based on currentIndex
+				prevButton.disabled = currentIndex === 0; // Disable if no previous video
+				nextButton.disabled = currentIndex === videoQueue.length - 1; // Disable if no next video
 		}
 
 		// Add event listeners for the pev/next buttons
@@ -338,10 +392,11 @@
 
 
 	<style>
-		.current-video {
-			font-weight: bold;
-			color: blue;
-		}
+	.current-video {
+		font-weight: bold;
+		color: blue;
+	}
 	</style>
 </body>
+
 </html>

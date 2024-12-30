@@ -103,20 +103,20 @@ th {text-align: center;}tbody th {text-align: left;}caption, td {text-align: lef
 /*** end TABLEs ***/
 /*** start rules to make LISTs consistant across all browsers ***/
 /* give lists consistant style - IE uses margin-left FF uses padding-left */
-OL, UL{margin:0px;padding:0px;line-height:1.5em;}
+OL, UL{margin:0;padding:0;line-height:1.5em;}
 OL{list-style:decimal;}
 OL OL{list-style:lower-alpha;}
 OL OL OL{list-style:upper-roman;}
 UL{list-style:disc;}
 UL UL{list-style:circle;}
 UL UL UL{list-style:square;}
-DL, OL, UL {margin-top:.25em;margin-left: 3em; padding-left: 0em; list-style-position:outside;}
+DL, OL, UL {margin: 1em 0 1em 3em; padding-left: 0em; list-style-position:outside;}
 /* nested lists get reduced margins and paddings */
 UL UL , OL OL, OL UL, UL OL {margin-left: 1em;list-style-position:outside;}
 OL OL UL, UL OL UL, OL OL OL {margin-left: 1em;list-style-position:outside;}
 LI{margin:0 1em .5em 0;padding:0;text-indent:0em;}
 DT{/*float:left;clear:left;*/font-weight:bold; margin-right:.5em;}
-DD{margin-left:0;padding-left:0;-webkit-margin-start:0px;font-weight:normal;margin-bottom:.5em;}
+DD{margin-left:0;padding-left:0;-webkit-margin-start:0;font-weight:normal;margin-bottom:.5em;}
 LI>UL, LI>OL{margin-top:.25em;/*margin-bottom:-.5em;*/padding-bottom:-.25em;}
 /* if we want to override default list style types do it with a class... */
 UL.circle {list-style-type:circle;}
@@ -137,7 +137,7 @@ UL.none{list-style-type:none;}
 /*** end rules to make LISTs consistent across all browsers ***/
 /*** start FORM elements ***/
 /* get rid of ugly box border in IE*/
-INPUT[type="radio"]{margin:0px;padding:0px;border:0px;background-color:transparent;}
+INPUT[type="radio"]{margin:0;padding:0;border:0;background-color:transparent;}
 /* align checkboxes, radios, text inputs with their label */
 /*INPUT[type="radio"] { vertical-align: text-bottom; }
 INPUT[type="checkbox"] { vertical-align: bottom; *vertical-align: baseline; }*/
@@ -147,7 +147,7 @@ label, input[type=button], input[type=submit], button { cursor: pointer;}
 input[type=button], input[type=submit], button{white-space:nowrap;}/*buttons with multiple lines look dumb and usually wrong*/
 /*** end FORM elements ***/
 /*** start links ***/
-/* remember to define focus styles! */:focus {outline: 0;}
+/* remember to define focus styles! :focus {outline: 0;}*/
 /* who thought blue linked image borders were a good idea? */a img,:link img,:visited img, a object,:link object,:visited object{ border:0; }
 /*some long-arse links refused to break nicely, this fixes*/A{word-wrap:break-word;}
 /* to prevent a gap from showing below images in some browsers */img {vertical-align: bottom;}
@@ -162,14 +162,19 @@ input[type=button], input[type=submit], button{white-space:nowrap;}/*buttons wit
 a:link {color: hsl(240,100%,75%);text-decoration:none;}
 a:visited {color: hsl(270,100%,75%);text-decoration: none;}
 a:hover {text-decoration: underline;}
-a:focus {text-decoration: none;}
-a:focus/*,:focus*/ {outline: 1px dotted yellow;}
+a:focus-visible {text-decoration: none;}
+a:focus-visible {outline: 1px dotted yellow;}
 a:hover,a:active {outline: none;}
 a:active{color: hsl(0,75%,66%);}
 /*** end links ***/
 /************************end reset**************************/
 body {
+	/* allow animate to height:auto */
+	interpolate-size: allow-keywords;
+	--white:#fff;
+	--black:#000;
 	--foreground1:rgb(192,192,192);
+	--foreground1l:rgb(256,256,256);
 	--background1:rgb(32,32,32);
 	--background2:rgb(16,16,16);
 	color: var(--foreground1);
@@ -184,8 +189,13 @@ IFRAME{
 }
 input, select, button{
 	padding: .25em .5em;
-	background: var(--foreground1);
+	border: 1px solid var(--black);
+	border-radius: .25em;
+	background-color: var(--foreground1);
 	color: var(--background1);
+}
+button:hover, button:focus, input:focus, select:focus{
+	background-color:var(--foreground1l);
 }
 .controls, .controls-playlist{
 	display: flex;
@@ -231,6 +241,7 @@ main ul a{
 	display:flex;
 	place-items:center;
 	gap:1rem;
+	padding-right:.5em;
 }
 main ul img{
 	height:128px;
@@ -241,7 +252,48 @@ main ul img{
 }
 
 .description{
+	display:none;
+	padding:.5em;
 	white-space: pre-wrap;
 	overflow: auto;
 	height:256px;
+	border: 1px solid var(--foreground1);
+	border-radius: .25em;
+}
+dialog{
+	display:none;
+	color: var(--foreground1);
+	background: var(--background1);
+	opacity:0;
+	translate: 0 -25vh;
+	transition-property: overlay display opacity;
+	transition-duration: 1s;
+	transition-behavior: allow-discrete;
+}
+dialog[open]{
+	display:block;
+	width: 80ch;
+	opacity:1;
+	translate: 0 0;
+	@starting-style{
+		opacity:0;
+		translate: 0 25vh;
+	}
+}
+dialog::backdrop{
+	transition-property: overlay display opacity;
+	transition-duration: 1s;
+	transition-behavior: allow-discrete;
+	opacity:0;
+	background:black;
+}
+dialog[open]::backdrop{
+	/*display:none;*/
+	opacity: .8;
+}
+@starting-style{
+	dialog[open]::backdrop{
+		opacity:0;
+		translate: 0 25vh;
+	}
 }
