@@ -1,6 +1,6 @@
 <?php
-// Replace EXAMPLE with your actual API key
-$apiKey = 'EXAMPLE';
+// Replace EXAMPLEKEY with your actual API key
+$apiKey = 'EXAMPLEKEY';
 
 // Get playlist ID and page token from the request
 $playlistId = $_GET['playlistId'] ?? '';
