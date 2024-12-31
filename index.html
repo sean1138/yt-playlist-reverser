@@ -196,7 +196,8 @@
 							title: item.snippet.title,
 							description: item.snippet.description, // Add description
 							position: item.snippet.position, // Add position
-							publishedAt: new Date(item.snippet.publishedAt), // Add upload date
+							// publishedAt: new Date(item.snippet.publishedAt), // Add upload date
+							publishedAt: formatPublishedDate(item.snippet.publishedAt), // Add formatted upload date
 							channelTitle: item.snippet.channelTitle, // Add channel title
 							// default (120x90), medium (320x180), high (480x360), standard (640x480), and maxres (unscaled), are the thumbnail options here but not all of them are guaranteed to exist for every video.
 							// Use the high-quality thumbnail if available, otherwise fallback to default
@@ -210,6 +211,24 @@
 			}
 			return videos.reverse(); // Reverse the video order
 		}
+
+		// Helper Function to Format the Date
+		function formatPublishedDate(publishedAt) {
+		    const date = new Date(publishedAt);
+
+		    // Extract individual components
+		    const dayOfWeek = date.toLocaleString('en-US', { weekday: 'short' }); // e.g., "Mon"
+		    const year = date.getFullYear(); // e.g., 2020
+		    const month = String(date.getMonth() + 1).padStart(2, '0'); // e.g., "02"
+		    const day = String(date.getDate()).padStart(2, '0'); // e.g., "24"
+		    const time = date.toTimeString().split(' ')[0]; // e.g., "12:08:06"
+		    const timezone = date.toTimeString().split(' ')[1]; // e.g., "GMT-0500 (Eastern Standard Time)"
+
+		    // Format as: Mon 2020.02.24 12:08:06 GMT-0500 (EST)
+		    const timezoneAbbreviation = timezone.match(/\(([^)]+)\)/)?.[1]?.split(' ')?.map(w => w[0])?.join('') || timezone;
+		    return `${year}.${month}.${day} (${dayOfWeek}) ${time} GMT${timezone.split(' ')[0].replace('GMT', '')} (${timezoneAbbreviation})`;
+		}
+
 
 		// playlist sorting logic
 		function sortPlaylist(videos, sortOrder) {
@@ -297,7 +316,10 @@
 					`<li>
 						<a href="#" data-index="${index}" data-video-id="${video.videoId}" class="${index === currentIndex ? 'current-video' : ''}">
 							<img src="${video.thumbnail}" alt="Thumbnail for ${video.title}" loading="lazy">
-							${video.title}
+							<div>
+								<p class="title">${video.title}</p>
+								<p class="date">${video.publishedAt}</p>
+							</div>
 						</a>
 					</li>`
 				)
