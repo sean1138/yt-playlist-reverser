@@ -203,7 +203,7 @@ button:hover, button:focus, input:focus, select:focus{
 	background-color:var(--foreground1l);
 }
 button img{
-	height: 1em;
+	height: 1.5rem;
 	width: auto;
 }
 .controls, .controls-playlist{
@@ -214,6 +214,11 @@ button img{
 }
 .controls p{
 	margin:0;
+}
+.controls > div{
+	display: flex;
+	align-items: center;
+	gap: .25em;
 }
 .controls-playlist{
 	display: none;
