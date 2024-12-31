@@ -69,6 +69,7 @@ footer{
 	display: flex;
 	place-items: center;
 	place-content: center;
+	border-top: 1px solid var(--background2);
 }
 /*** start typography ***/
 /* this choice of font-family is supposed to render text the same across platforms
@@ -178,10 +179,10 @@ body {
 	--white:#fff;
 	--black:#000;
 	--foreground1:hsl(120,4%,76%);
-	--foreground1l:hsl(120,100%,98%);
-	--background1:hsl(0,8%,12%);
+	--foreground1l:hsl(120,100%,96%);
+	--background1:hsl(0,4%,12%);
 	--background2:hsl(0,60%,4%);
-	--scroller:hsl(120,5%,30%);
+	--scroller:hsl(120,4%,30%);
 	--br: .25rem;
 	color: var(--foreground1);
 	background: var(--background1);
@@ -297,7 +298,7 @@ main ul .date{
 	font-size: .75em;
 }
 .current-video{
-	margin-right: -2px;
+	margin: 0 -1px 0 -1px;
 	background:var(--background2);
 	pointer-events: none;
 }
