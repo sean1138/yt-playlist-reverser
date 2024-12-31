@@ -170,17 +170,24 @@ a:hover,a:active {outline: none;}
 a:active{color: hsl(0,75%,66%);}
 /*** end links ***/
 /************************end reset**************************/
+
 body {
 	/* allow animate to height:auto */
 	interpolate-size: allow-keywords;
 	--white:#fff;
 	--black:#000;
-	--foreground1:rgb(192,192,192);
-	--foreground1l:rgb(256,256,256);
-	--background1:rgb(32,32,32);
-	--background2:rgb(16,16,16);
+	--foreground1:rgb(192,196,192);
+	--foreground1l:rgb(244,256,244);
+	--background1:rgb(32,28,28);
+	--background2:rgb(16,4,4);
+	--scroller:rgb(72,68,68);
+	--br: .25rem;
 	color: var(--foreground1);
 	background: var(--background1);
+}
+
+*{
+	scrollbar-color: var(--scroller) var(--background2);
 }
 
 IFRAME{
@@ -192,7 +199,7 @@ IFRAME{
 input, select, button{
 	padding: .25em .5em;
 	border: 1px solid var(--black);
-	border-radius: .25em;
+	border-radius: var(--br);
 	background-color: var(--foreground1);
 	color: var(--background1);
 }
@@ -234,7 +241,7 @@ main{
 .left{
 	display: flex;
 	flex-direction: column;
-	gap:1rem;
+	gap: 1rem;
 	width:100%;
 	flex:1;
 }
@@ -247,6 +254,8 @@ main{
 }
 main ul{
 	margin:0;
+	/* make room for the focus style borders on the links to show */
+	padding: 0 2px;
 	list-style: none;
 }
 main li{
@@ -255,7 +264,7 @@ main li{
 main ul a{
 	display:flex;
 	place-items:center;
-	gap:1rem;
+	gap: 1rem;
 	padding-right:.5em;
 }
 main ul img{
@@ -286,10 +295,11 @@ main ul .date{
 	overflow: auto;
 	height:256px;
 	border: 1px solid var(--foreground1);
-	border-radius: .25em;
+	border-radius: var(--br);
 }
 dialog{
 	display:none;
+	border-radius: var(--br);
 	color: var(--foreground1);
 	background: var(--background1);
 	opacity:0;
