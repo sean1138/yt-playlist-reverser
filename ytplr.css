@@ -65,7 +65,9 @@ main {
 	margin-bottom: auto;
 }
 footer{
+	display: flex;
 	place-items: center;
+	place-content: center;
 }
 /*** start typography ***/
 /* this choice of font-family is supposed to render text the same across platforms
