@@ -296,7 +296,7 @@
 				.map((video, index) =>
 					`<li>
 						<a href="#" data-index="${index}" data-video-id="${video.videoId}" class="${index === currentIndex ? 'current-video' : ''}">
-							<img src="${video.thumbnail}" alt="Thumbnail for ${video.title}">
+							<img src="${video.thumbnail}" alt="Thumbnail for ${video.title}" loading="lazy">
 							${video.title}
 						</a>
 					</li>`
