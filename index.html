@@ -11,7 +11,7 @@
 	<header>
 		<h1>YouTube Playlist Reverser</h1>
 		<div class="controls">
-			<div id="two">
+			<div class="playlist-input">
 				<label for="playlistURL">Paste Playlist URL:</label>
 				<input type="text" id="playlistURL" placeholder="https://www.youtube.com/playlist?list=...">
 				<button id="loadPlaylist" type="submit">Load Playlist</button>
@@ -25,10 +25,13 @@
 					<option value="titleAsc">Video Title (A-Z)</option>
 					<option value="titleDesc">Video Title (Z-A)</option>
 				</select>
+				<button id="randomizePlaylist" type="button" title="Randomize Playlist"><img src="svgrepo-com-dice-6.svg" alt="dice icon"></button>
 			</div>
-			<button id="resetPage">reset</button>
-			<button id="oma" data-modal="modal-about">about</button>
-			<button id="omh" data-modal="modal-help">help</button>
+			<div class="icon-buttons">
+				<button id="resetPage" title="Reset Page"><img src="svgrepo-com-reset.svg" alt="reset icon"></button>
+				<button id="oma" data-modal="modal-about" title="About"><img src="svgrepo-com-info-circle.svg" alt="info icon"></button>
+				<button id="omh" data-modal="modal-help" title="How To Use"><img src="svgrepo-com-help.svg" alt="help icon"></button>
+			</div>
 		</div>
 	</header>
 	<main>
@@ -233,6 +236,28 @@
 			currentIndex = 0; // Reset to the first video
 			playVideo(sortedVideos[currentIndex].videoId, playlistId, currentIndex); // Play the first video in the sorted order
 		});
+
+		// Shuffle an array
+		function shuffleArray(array) {
+			for (let i = array.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[array[i], array[j]] = [array[j], array[i]];
+			}
+			return array;
+		}
+
+		// Randomize playlist and regenerate links
+		function randomizePlaylist() {
+				const shuffledVideos = shuffleArray(videoQueue.slice()); // Clone and shuffle the playlist
+				generatePlaylistLinks(shuffledVideos, playlistId); // Regenerate playlist links
+				currentIndex = 0; // Reset to the first video
+				playVideo(shuffledVideos[currentIndex].videoId, playlistId, currentIndex); // Play the first video in the shuffled playlist
+				updateControlButtons(); // Update next/previous buttons
+		}
+
+		// Add event listener to the randomize button
+		document.getElementById('randomizePlaylist').addEventListener('click', randomizePlaylist);
+
 
 
 		// Initialize the YouTube player

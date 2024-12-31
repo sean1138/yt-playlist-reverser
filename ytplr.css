@@ -200,6 +200,10 @@ button{
 button:hover, button:focus, input:focus, select:focus{
 	background-color:var(--foreground1l);
 }
+button img{
+	height: 1em;
+	width: auto;
+}
 .controls, .controls-playlist{
 	display: flex;
 	justify-content: space-between;
@@ -213,6 +217,7 @@ button:hover, button:focus, input:focus, select:focus{
 	display: none;
 	position: sticky;
 	top: 0;
+	padding: .5rem;
 	background:var(--background2);
 }
 main{
