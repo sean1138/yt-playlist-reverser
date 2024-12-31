@@ -9,6 +9,7 @@ A web-based tool that allows users to load YouTube playlists and change the play
   - Upload Date (Newest First).
   - Video Title (A-Z).
   - Video Title (Z-A).
+ - **Randomize Button:** Shuffles the playlist order with every press.
 - **Video Description Display:** Displays the description of the currently playing video.
 - **Scroll to Current Video:** Automatically scrolls the current video in the playlist into view, with button to manually scroll to it as well.
 - **Next/Previous Video Navigation:** Buttons to move to the next or previous video in the playlist.
