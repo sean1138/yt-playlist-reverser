@@ -386,3 +386,6 @@ dialog[open]::backdrop{
 		translate: 0 25vh;
 	}
 }
+input[data-tooltip]{
+	cursor: pointer;
+}

@@ -49,7 +49,7 @@
 		</div>
 	</main>
 	<footer>
-		<p>&copy; 2024.12.30</p>
+		<p>&copy; 2024.12.30 - <span class="current-year"></span></p>
 	</footer>
 	<dialog id="modal-about">
 		<h2>About</h2>
@@ -59,7 +59,10 @@
 	<dialog id="modal-help">
 		<h2>Help</h2>
 		<ol>
-			<li>Copy a playlist URL from youtube</li>
+			<li>Copy a playlist URL from youtube
+				<ul>
+					<li>Click to copy this example URL <input id="samplePlaylist" type="text" value="https://www.youtube.com/playlist?list=PLq0Zd--a9liohK8sVPZ1IRiqxKBEI6P3l" title="Click to copy the playlist URL" readonly data-tooltip=""></li>
+				</ul></li>
 			<li>Paste URL into text input</li>
 			<li>Hit the enter key or hit the 'Load Playlist' button</li>
 			<li>Enjoy</li>
@@ -68,6 +71,33 @@
 	</dialog>
 
 	<script>
+		// get current year
+		document.querySelector('.current-year').textContent = new Date().getFullYear();
+
+		// click text input to copy value
+		document.getElementById("samplePlaylist").addEventListener("click", function () {
+		  // Select the input value
+		  this.select();
+		  this.setSelectionRange(0, this.value.length); // For mobile devices
+		  // Copy to clipboard
+		  navigator.clipboard
+		    .writeText(this.value)
+		    .then(() => {
+		      // Temporarily change the title attribute
+		      const originalTitle = this.title;
+		      this.title = 'Playlist copied to clipboard!';
+		      // Provide visual feedback
+		      this.setAttribute('data-tooltip', 'Playlist copied to clipboard!');
+		      this.style.background = 'green';
+		      setTimeout(() => {
+		        this.title = originalTitle;
+		        this.removeAttribute("data-tooltip");
+		        this.style.background = 'revert-layer';
+		      }, 5000);
+		    })
+		    .catch((err) => console.error("Failed to copy text: ", err));
+		});
+
 		// Event delegation for opening modals
 		document.addEventListener("click", (event) => {
 			const openButton = event.target.closest("[data-modal]");
