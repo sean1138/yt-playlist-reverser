@@ -189,7 +189,7 @@ html{
 }
 html:before{
 	display: block;
-	position: absolute;
+	position: fixed;
 	top:0;
 	right:0;
 	bottom:0;
@@ -344,7 +344,7 @@ main ul .date{
 	padding:.5em;
 	white-space: pre-wrap;
 	overflow: auto;
-	height:256px;
+	max-height:256px;
 	border: 1px solid var(--foreground1);
 	border-radius: var(--br);
 }
