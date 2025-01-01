@@ -286,7 +286,7 @@
 			playVideo(sortedVideos[currentIndex].videoId, playlistId, currentIndex); // Play the first video in the sorted order
 		});
 
-		// Shuffle an array
+		// Shuffle playlist array
 		function shuffleArray(array) {
 			for (let i = array.length - 1; i > 0; i--) {
 				const j = Math.floor(Math.random() * (i + 1));
@@ -294,7 +294,6 @@
 			}
 			return array;
 		}
-
 		// Randomize playlist and regenerate links
 		function randomizePlaylist() {
 				const shuffledVideos = shuffleArray(videoQueue.slice()); // Clone and shuffle the playlist
@@ -303,11 +302,8 @@
 				playVideo(shuffledVideos[currentIndex].videoId, playlistId, currentIndex); // Play the first video in the shuffled playlist
 				updateControlButtons(); // Update next/previous buttons
 		}
-
 		// Add event listener to the randomize button
 		document.getElementById('randomizePlaylist').addEventListener('click', randomizePlaylist);
-
-
 
 		// Initialize the YouTube player
 		function initializePlayer(videoId) {
