@@ -52,6 +52,7 @@ body {
 	/* remove empty space below footer on short content pages 1/2 */
 	display: flex;
 	flex-direction: column;
+	gap: 2rem;
 	min-height: 100vh;
 	height: 100%;
 }
@@ -64,7 +65,11 @@ header{
 main {
 	/* remove empty space below footer on short content pages 2/2 */
 	margin-bottom: auto;
+	display:flex;
 	flex-wrap: wrap;
+	gap: 1rem;
+	max-width: 1712px;
+	align-self: center;
 }
 main, footer{
 	/* From https://css.glass */
@@ -219,6 +224,11 @@ body {
 	scrollbar-color: var(--scroller) var(--background2);
 }
 
+h1{
+	margin: 0;
+	line-height: 1;
+}
+
 IFRAME{
 	width: 100%;
 	height: auto;
@@ -272,12 +282,6 @@ button img{
 	padding: .5rem;
 	background:var(--background2);
 }
-main{
-	display:flex;
-	gap: 1rem;
-	max-width: 1712px;
-	align-self: center;
-}
 .left{
 	display: flex;
 	flex-direction: column;
@@ -288,10 +292,13 @@ main{
 .right{
 	width:50%;
 	max-width: 512px;
-	max-height: 720px;
+	max-height: calc(720px - 2px);
 	overflow: auto;
 	flex:1;
-	border-bottom: 2px solid var(--background2);
+	background:var(--background2);
+	border: 2px solid var(--background2);
+	border-top: none;
+	border-right: none;
 	border-radius: var(--br);
 }
 .right:has(#playlist:empty) {
