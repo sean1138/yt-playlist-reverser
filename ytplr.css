@@ -246,7 +246,7 @@ input, select, button{
 button{
 	text-transform: capitalize;
 }
-button:hover, button:focus, input:focus, select:focus{
+button:hover, button:focus-visible, input:focus-visible, select:focus-visible{
 	background-color:var(--foreground1l);
 }
 button img{
