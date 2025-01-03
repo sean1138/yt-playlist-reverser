@@ -275,6 +275,8 @@ button img{
 main{
 	display:flex;
 	gap: 1rem;
+	max-width: 1712px;
+	align-self: center;
 }
 .left{
 	display: flex;
