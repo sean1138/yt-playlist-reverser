@@ -205,11 +205,11 @@ body {
 	interpolate-size: allow-keywords;
 	--white:#fff;
 	--black:#000;
-	--foreground1:hsl(120,4%,76%);
-	--foreground1l:hsl(120,100%,96%);
+	--foreground1:hsl(24,8%,76%);
+	--foreground1l:hsl(24,100%,96%);
 	--background1:hsl(0,4%,12%);
 	--background2:hsl(0,60%,4%);
-	--scroller:hsl(120,4%,30%);
+	--scroller:hsl(24,8%,30%);
 	--br: .25rem;
 	color: var(--foreground1);
 /*	background: var(--background1);*/
@@ -221,7 +221,7 @@ body {
 
 IFRAME{
 	width: 100%;
-	height: 100%;
+	height: auto;
 	max-height: 720px;
 	aspect-ratio: 16 / 10;
 	border-radius: var(--br);
