@@ -263,6 +263,7 @@ button img{
 }
 .controls-playlist{
 	justify-content: space-between;
+	z-index: 1;
 }
 .controls p{
 	margin:0;
