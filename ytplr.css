@@ -317,6 +317,7 @@ main li{
 	background: var(--background1);
 }
 main ul a{
+	position: relative;
 	display:flex;
 	place-items:center;
 	gap: 1rem;
@@ -342,10 +343,20 @@ main ul p{
 main ul .date{
 	font-size: .75em;
 }
+main ul .index-display{
+	padding: .125em .25em;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	background: var(--background2);
+}
 .current-video{
 	margin: 0 -1px 0 -1px;
 	background:var(--background2);
 	pointer-events: none;
+}
+.current-video .index-display{
+	background: var(--background1);
 }
 
 .description{

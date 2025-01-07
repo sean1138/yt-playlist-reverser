@@ -337,6 +337,7 @@
 		function generatePlaylistLinks(videos, playlistId) {
 			const playlistContainer = document.getElementById('playlist');
 			const playlistControls = document.querySelector('.controls-playlist');
+			const totalVideos = videos.length; // Total number of videos
 			playlistContainer.innerHTML = videos
 				.map((video, index) =>
 					`<li>
@@ -346,6 +347,7 @@
 								<p class="title">${video.title}</p>
 								<p class="date">${video.publishedAt}</p>
 							</div>
+					<span class="index-display">${index + 1}/${totalVideos}</span>
 						</a>
 					</li>`
 				)
