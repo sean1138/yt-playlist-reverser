@@ -344,19 +344,24 @@ main ul p{
 main ul .date{
 	font-size: .75em;
 }
-main ul .index-display{
-	padding: .125em .25em;
+main ul span{
 	position: absolute;
+	padding: .125em .25em;
+	background: var(--background2);
+}
+main ul .index-display{
 	right: 0;
 	bottom: 0;
-	background: var(--background2);
+}
+main ul .duration-display{
+	bottom:0;
 }
 .current-video{
 	margin: 0 -1px 0 -1px;
 	background:var(--background2);
 	pointer-events: none;
 }
-.current-video .index-display{
+.current-video span{
 	background: var(--background1);
 }
 

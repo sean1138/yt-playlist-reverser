@@ -76,26 +76,26 @@
 
 		// click text input to copy value
 		document.getElementById("samplePlaylist").addEventListener("click", function () {
-		  // Select the input value
-		  this.select();
-		  this.setSelectionRange(0, this.value.length); // For mobile devices
-		  // Copy to clipboard
-		  navigator.clipboard
-		    .writeText(this.value)
-		    .then(() => {
-		      // Temporarily change the title attribute
-		      const originalTitle = this.title;
-		      this.title = 'Playlist copied to clipboard!';
-		      // Provide visual feedback
-		      this.setAttribute('data-tooltip', 'Playlist copied to clipboard!');
-		      this.style.background = 'green';
-		      setTimeout(() => {
-		        this.title = originalTitle;
-		        this.removeAttribute("data-tooltip");
-		        this.style.background = 'revert-layer';
-		      }, 5000);
-		    })
-		    .catch((err) => console.error("Failed to copy text: ", err));
+			// Select the input value
+			this.select();
+			this.setSelectionRange(0, this.value.length); // For mobile devices
+			// Copy to clipboard
+			navigator.clipboard
+				.writeText(this.value)
+				.then(() => {
+					// Temporarily change the title attribute
+					const originalTitle = this.title;
+					this.title = 'Playlist copied to clipboard!';
+					// Provide visual feedback
+					this.setAttribute('data-tooltip', 'Playlist copied to clipboard!');
+					this.style.background = 'green';
+					setTimeout(() => {
+						this.title = originalTitle;
+						this.removeAttribute("data-tooltip");
+						this.style.background = 'revert-layer';
+					}, 5000);
+				})
+				.catch((err) => console.error("Failed to copy text: ", err));
 		});
 
 		// Event delegation for opening modals
@@ -145,6 +145,8 @@
 			window.location.reload();
 		});
 
+		//
+		//
 		// get stuff from youtube and do things with them
 		let player; // Global player variable
 		let videoQueue = [];
@@ -236,27 +238,68 @@
 					}
 					nextPageToken = data.nextPageToken || '';
 				} while (nextPageToken);
+				// Fetch video durations in bulk
+				const videoIds = videos.map(video => video.videoId).join(',');
+				const durationResponse = await fetch(`ytplr.php?videoIds=${videoIds}`);
+				const durationData = await durationResponse.json();
+				console.log('Fetching durations for video IDs:', videoIds);
+				console.log('Duration API response:', durationData);
+
+
+
+				if (!durationResponse.ok || durationData.error) {
+						console.error('Error fetching video durations:', durationData.error || durationResponse.statusText);
+						throw new Error('Failed to fetch video durations');
+				}
+
+				const durationsMap = Object.fromEntries(
+						durationData.items.map(item => [item.id, item.contentDetails.duration])
+				);
+
+				videos = videos.map(video => ({
+						...video,
+						duration: parseDuration(durationsMap[video.videoId] || 'PT0S'), // Parse ISO 8601 duration || Default to 'PT0S' if duration is missing
+				}));
 			} catch (error) {
 				console.error('Error fetching playlist videos:', error);
 			}
 			return videos.reverse(); // Reverse the video order
 		}
 
+		// Function to parse ISO 8601 duration strings into readable format (e.g., "2:30" for 2 minutes and 30 seconds)
+		function parseDuration(duration) {
+			// Match duration components (hours, minutes, seconds)
+			const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+			if (!match) return "0:00"; // Default to "0:00" if the duration is invalid
+
+			const hours = parseInt(match[1] || 0, 10); // Hours
+			const minutes = parseInt(match[2] || 0, 10); // Minutes
+			const seconds = parseInt(match[3] || 0, 10); // Seconds
+
+			// Format the duration
+			const formattedSeconds = seconds.toString().padStart(2, '0');
+			const formattedMinutes = hours > 0
+				? `${hours}:${minutes.toString().padStart(2, '0')}`
+				: `${minutes}`;
+
+			return `${formattedMinutes}:${formattedSeconds}`;
+		}
+
 		// Helper Function to Format the Date
 		function formatPublishedDate(publishedAt) {
-		    const date = new Date(publishedAt);
+				const date = new Date(publishedAt);
 
-		    // Extract individual components
-		    const dayOfWeek = date.toLocaleString('en-US', { weekday: 'short' }); // e.g., "Mon"
-		    const year = date.getFullYear(); // e.g., 2020
-		    const month = String(date.getMonth() + 1).padStart(2, '0'); // e.g., "02"
-		    const day = String(date.getDate()).padStart(2, '0'); // e.g., "24"
-		    const time = date.toTimeString().split(' ')[0]; // e.g., "12:08:06"
-		    const timezone = date.toTimeString().split(' ')[1]; // e.g., "GMT-0500 (Eastern Standard Time)"
+				// Extract individual components
+				const dayOfWeek = date.toLocaleString('en-US', { weekday: 'short' }); // e.g., "Mon"
+				const year = date.getFullYear(); // e.g., 2020
+				const month = String(date.getMonth() + 1).padStart(2, '0'); // e.g., "02"
+				const day = String(date.getDate()).padStart(2, '0'); // e.g., "24"
+				const time = date.toTimeString().split(' ')[0]; // e.g., "12:08:06"
+				const timezone = date.toTimeString().split(' ')[1]; // e.g., "GMT-0500 (Eastern Standard Time)"
 
-		    // Format as: Mon 2020.02.24 12:08:06 GMT-0500 (EST)
-		    const timezoneAbbreviation = timezone.match(/\(([^)]+)\)/)?.[1]?.split(' ')?.map(w => w[0])?.join('') || timezone;
-		    return `${year}.${month}.${day} (${dayOfWeek}) ${time} GMT${timezone.split(' ')[0].replace('GMT', '')} (${timezoneAbbreviation})`;
+				// Format as: Mon 2020.02.24 12:08:06 GMT-0500 (EST)
+				const timezoneAbbreviation = timezone.match(/\(([^)]+)\)/)?.[1]?.split(' ')?.map(w => w[0])?.join('') || timezone;
+				return `${year}.${month}.${day} (${dayOfWeek}) ${time} GMT${timezone.split(' ')[0].replace('GMT', '')} (${timezoneAbbreviation})`;
 		}
 
 
@@ -348,6 +391,7 @@
 								<p class="date">${video.publishedAt}</p>
 							</div>
 					<span class="index-display">${index + 1}/${totalVideos}</span>
+					<span class="duration-display">${video.duration}</span>
 						</a>
 					</li>`
 				)
