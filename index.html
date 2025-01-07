@@ -22,10 +22,12 @@
 				<label for="sortOrder">Sort Playlist By:</label>
 				<select id="sortOrder">
 					<!-- <option value="reverse">Reverse Order</option> -->
-					<option value="uploadOldest" selected>Upload Date (Oldest First)</option>
-					<option value="uploadNewest">Upload Date (Newest First)</option>
-					<option value="titleAsc">Video Title (A-Z)</option>
-					<option value="titleDesc">Video Title (Z-A)</option>
+					<option value="uploadOldest" selected>Oldest First</option>
+					<option value="uploadNewest">Newest First</option>
+					<option value="titleAsc">A-Z</option>
+					<option value="titleDesc">Z-A</option>
+					<option value="durationAsc">Shortest First</option>
+					<option value="durationDesc">Longest First</option>
 				</select>
 				<button id="randomizePlaylist" type="button" title="Randomize Playlist"><img src="svgrepo-com-dice-6.svg" alt="dice icon"></button>
 			</div>
@@ -242,10 +244,8 @@
 				const videoIds = videos.map(video => video.videoId).join(',');
 				const durationResponse = await fetch(`ytplr.php?videoIds=${videoIds}`);
 				const durationData = await durationResponse.json();
-				console.log('Fetching durations for video IDs:', videoIds);
-				console.log('Duration API response:', durationData);
-
-
+				// console.log('Fetching durations for video IDs:', videoIds);
+				// console.log('Duration API response:', durationData);
 
 				if (!durationResponse.ok || durationData.error) {
 						console.error('Error fetching video durations:', durationData.error || durationResponse.statusText);
@@ -258,7 +258,8 @@
 
 				videos = videos.map(video => ({
 						...video,
-						duration: parseDuration(durationsMap[video.videoId] || 'PT0S'), // Parse ISO 8601 duration || Default to 'PT0S' if duration is missing
+						durationReadable: parseDuration(durationsMap[video.videoId] || 'PT0S'), // Parse ISO 8601 duration || Default to 'PT0S' if duration is missing
+						duration: parseISODuration(durationsMap[video.videoId] || 'PT0S'), // Parse ISO 8601 duration to seconds || Default to 'PT0S' if duration is missing
 				}));
 			} catch (error) {
 				console.error('Error fetching playlist videos:', error);
@@ -283,6 +284,17 @@
 				: `${minutes}`;
 
 			return `${formattedMinutes}:${formattedSeconds}`;
+		}
+		// Function to parse ISO 8601 duration strings into
+		function parseISODuration(duration) {
+				const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+				if (!match) return 0;
+
+				const hours = parseInt(match[1] || 0, 10);
+				const minutes = parseInt(match[2] || 0, 10);
+				const seconds = parseInt(match[3] || 0, 10);
+
+				return hours * 3600 + minutes * 60 + seconds; // Return total duration in seconds
 		}
 
 		// Helper Function to Format the Date
@@ -314,6 +326,10 @@
 					return videos.sort((a, b) => a.title.localeCompare(b.title)); // A-Z
 				case "titleDesc":
 					return videos.sort((a, b) => b.title.localeCompare(a.title)); // Z-A
+				case "durationAsc":
+					return videos.sort((a, b) => a.duration - b.duration); // Shortest first
+				case "durationDesc":
+					return videos.sort((a, b) => b.duration - a.duration); // Longest first
 				case "reverse":
 				default:
 					return videos.reverse(); // Default: reverse order
@@ -321,6 +337,7 @@
 			// Update the description div with the current video's description
 			updateDescrip();
 		}
+		// Add event listener for sorting dropdown
 		document.getElementById('sortOrder').addEventListener('change', () => {
 			const sortOrder = document.getElementById('sortOrder').value;
 			const sortedVideos = sortPlaylist(videoQueue.slice(), sortOrder); // Clone the array before sorting
@@ -391,7 +408,7 @@
 								<p class="date">${video.publishedAt}</p>
 							</div>
 					<span class="index-display">${index + 1}/${totalVideos}</span>
-					<span class="duration-display">${video.duration}</span>
+					<span class="duration-display">${video.durationReadable}</span>
 						</a>
 					</li>`
 				)
