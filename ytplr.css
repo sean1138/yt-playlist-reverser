@@ -347,14 +347,20 @@ main ul .date{
 main ul span{
 	position: absolute;
 	padding: .125em .25em;
+	font-size: .75em;
 	background: var(--background2);
+	border-radius: var(--br);
+	border-bottom-left-radius: initial;
+	border-bottom-right-radius: initial;
 }
 main ul .index-display{
 	right: 0;
 	bottom: 0;
+	border-top-right-radius: initial;
 }
 main ul .duration-display{
 	bottom:0;
+	border-top-left-radius: initial;
 }
 .current-video{
 	margin: 0 -1px 0 -1px;

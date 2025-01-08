@@ -218,7 +218,14 @@
 			try {
 				do {
 					const response = await fetch(`ytplr.php?playlistId=${playlistId}&pageToken=${nextPageToken}`);
-					const data = await response.json();
+					const text = await response.text(); // Get raw response text
+					let data;
+					try {
+					    data = JSON.parse(text); // Parse the JSON response
+					} catch (parseError) {
+					    console.error('Failed to parse JSON:', parseError, text);
+					    throw new Error('Invalid JSON response from server');
+					}
 
 					if (!response.ok || data.error) {
 						throw new Error(data.error || `API request failed with status ${response.status}`);
@@ -240,27 +247,55 @@
 					}
 					nextPageToken = data.nextPageToken || '';
 				} while (nextPageToken);
+				if (videos.length === 0) {
+				    console.warn('No videos found in playlist');
+				    return videos;
+				}
 				// Fetch video durations in bulk
 				const videoIds = videos.map(video => video.videoId).join(',');
 				const durationResponse = await fetch(`ytplr.php?videoIds=${videoIds}`);
 				const durationData = await durationResponse.json();
 				// console.log('Fetching durations for video IDs:', videoIds);
-				// console.log('Duration API response:', durationData);
+				console.log('Duration API response:', durationData);
 
 				if (!durationResponse.ok || durationData.error) {
 						console.error('Error fetching video durations:', durationData.error || durationResponse.statusText);
 						throw new Error('Failed to fetch video durations');
 				}
 
+				// Add a check for durationData.items:
+				if (!durationData.items || !Array.isArray(durationData.items)) {
+				    console.error('Invalid duration data:', durationData);
+				    throw new Error('No valid duration items returned from the API');
+				}
+
 				const durationsMap = Object.fromEntries(
 						durationData.items.map(item => [item.id, item.contentDetails.duration])
 				);
-
+				console.log('Durations map:', durationsMap);
 				videos = videos.map(video => ({
 						...video,
 						durationReadable: parseDuration(durationsMap[video.videoId] || 'PT0S'), // Parse ISO 8601 duration || Default to 'PT0S' if duration is missing
 						duration: parseISODuration(durationsMap[video.videoId] || 'PT0S'), // Parse ISO 8601 duration to seconds || Default to 'PT0S' if duration is missing
 				}));
+
+				// get mpaa ratings?
+				// const mpaaResponse = await fetch(`ytplr.php?videoIds=${videoIds}`);
+				// const mpaaData = await mpaaResponse.json();
+				// const mpaaMap = Object.fromEntries(
+				// 		mpaaData.items.map(item => [item.id, item.contentDetails.contentRating.mpaaRating])
+				// );
+
+				// other interesting infos we could get
+				// etag
+				// contentDetails.licensedContent
+				// contentDetails.regionRestriction.allowed[]
+				// contentDetails.regionRestriction.blocked[]
+				// contentDetails.contentRating.tvpgRating
+				// statistics.viewCount
+				// statistics.likeCount
+				// statistics.dislikeCount
+
 			} catch (error) {
 				console.error('Error fetching playlist videos:', error);
 			}
@@ -271,7 +306,10 @@
 		function parseDuration(duration) {
 			// Match duration components (hours, minutes, seconds)
 			const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-			if (!match) return "0:00"; // Default to "0:00" if the duration is invalid
+			if (!match) {
+			        console.warn('Invalid ISO duration format:', duration);
+			        return "0:00"; // Default to "0:00" if the duration is invalid
+			    }
 
 			const hours = parseInt(match[1] || 0, 10); // Hours
 			const minutes = parseInt(match[2] || 0, 10); // Minutes
@@ -285,10 +323,13 @@
 
 			return `${formattedMinutes}:${formattedSeconds}`;
 		}
-		// Function to parse ISO 8601 duration strings into
+		// Function to parse ISO 8601 duration strings into seconds
 		function parseISODuration(duration) {
 				const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-				if (!match) return 0;
+				if (!match) {
+				        console.warn('Invalid ISO duration format:', duration);
+				        return 0;
+				    }
 
 				const hours = parseInt(match[1] || 0, 10);
 				const minutes = parseInt(match[2] || 0, 10);
