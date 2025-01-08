@@ -23,7 +23,7 @@ A web-based tool that allows users to load YouTube playlists and change the play
 
 1. Clone the repository or download the source code.
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/sean1138/yt-playlist-reverser.git
    ```
 
 2. Set up a local web server (e.g., Apache, Nginx, whatever). Place the project files in the server's document root.
