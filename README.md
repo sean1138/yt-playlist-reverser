@@ -1,16 +1,18 @@
 # YouTube Playlist Reverser
 
-A web-based tool that allows users to load YouTube playlists and change the playback order. This tool sorts the playlist videos by upload date, video title, ascending and descending.
+A web-based tool that allows users to load YouTube playlists and change the playback order. This tool sorts the playlist videos by upload date, video title, and duration.
 
 ![page screenshot](ytplr-screenshot.jpg)
 
 ## Features
 
 - **Custom Sorting Options:**
-  - Upload Date (Oldest First) [Default].
-  - Upload Date (Newest First).
-  - Video Title (A-Z).
-  - Video Title (Z-A).
+  - Oldest First [Default].
+  - Newest First.
+  - A-Z.
+  - Z-A.
+  - Shortest First.
+  - Longest First.
  - **Randomize Button:** Shuffles the playlist order with every press.
 - **Video Description Display:** Displays the description of the currently playing video.
 - **Scroll to Current Video:** Automatically scrolls the current video in the playlist into view, with button to manually scroll to it as well.
@@ -24,7 +26,7 @@ A web-based tool that allows users to load YouTube playlists and change the play
    git clone <repository-url>
    ```
 
-2. Set up a local web server (e.g., Apache, Nginx, or a simple Python HTTP server). Place the project files in the server's document root.
+2. Set up a local web server (e.g., Apache, Nginx, whatever). Place the project files in the server's document root.
 
 3. Obtain a YouTube Data API v3 key:
    - Go to the [Google Cloud Console](https://console.cloud.google.com/).
@@ -44,10 +46,10 @@ A web-based tool that allows users to load YouTube playlists and change the play
 
 1. Paste a YouTube playlist URL into the text input box and click "Load Playlist" button or hit the enter key.
 2. Use the dropdown menu to select your desired playback order:
-   - Upload Date (Oldest First) [Default].
-   - Upload Date (Newest First).
-   - Video Title (A-Z).
-   - Video Title (Z-A).
+   - Oldest First [Default].
+   - Newest First.
+   - A-Z.
+   - Z-A.
 3. Click on any video in the playlist to start playback.
 4. Use the Next/Previous buttons to navigate through the playlist.
 5. Click the "Scroll to Current Video" button to quickly bring the currently playing video into view within the playlist if you've scrolled away from it.
