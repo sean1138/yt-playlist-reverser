@@ -346,8 +346,9 @@ main ul .date{
 }
 main ul span{
 	position: absolute;
-	padding: .125em .25em;
+	padding: .5em;
 	font-size: .75em;
+	line-height: 1;
 	background: var(--background2);
 	border-radius: var(--br);
 	border-bottom-left-radius: initial;
