@@ -21,7 +21,6 @@
 			<div id="sortingOptions">
 				<label for="sortOrder">Sort Playlist By:</label>
 				<select id="sortOrder">
-					<!-- <option value="reverse">Reverse Order</option> -->
 					<option value="uploadOldest" selected>Oldest First</option>
 					<option value="uploadNewest">Newest First</option>
 					<option value="titleAsc">A-Z</option>
@@ -237,8 +236,8 @@
 							title: item.snippet.title,
 							description: item.snippet.description, // Add description
 							position: item.snippet.position, // Add position
-							// publishedAt: new Date(item.snippet.publishedAt), // Add upload date
-							publishedAt: formatPublishedDate(item.snippet.publishedAt), // Add formatted upload date
+							publishedAt: new Date(item.snippet.publishedAt), // Add upload date
+							publishedAtF: formatPublishedDate(item.snippet.publishedAt), // Add formatted upload date
 							channelTitle: item.snippet.channelTitle, // Add channel title
 							// default (120x90), medium (320x180), high (480x360), standard (640x480), and maxres (unscaled), are the thumbnail options here but not all of them are guaranteed to exist for every video.
 							// Use the high-quality thumbnail if available, otherwise fallback to default
@@ -371,7 +370,6 @@
 					return videos.sort((a, b) => a.duration - b.duration); // Shortest first
 				case "durationDesc":
 					return videos.sort((a, b) => b.duration - a.duration); // Longest first
-				case "reverse":
 				default:
 					return videos.reverse(); // Default: reverse order
 			}
@@ -446,7 +444,7 @@
 							<img src="${video.thumbnail}" alt="Thumbnail for ${video.title}" loading="lazy">
 							<div>
 								<p class="title">${video.title}</p>
-								<p class="date">${video.publishedAt}</p>
+								<p class="date">${video.publishedAtF}</p>
 							</div>
 					<span class="index-display">${index + 1}/${totalVideos}</span>
 					<span class="duration-display">${video.durationReadable}</span>
