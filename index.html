@@ -254,8 +254,9 @@
 				const videoIds = videos.map(video => video.videoId).join(',');
 				const durationResponse = await fetch(`ytplr.php?videoIds=${videoIds}`);
 				const durationData = await durationResponse.json();
+				// debugging
 				// console.log('Fetching durations for video IDs:', videoIds);
-				console.log('Duration API response:', durationData);
+				// console.log('Duration API response:', durationData);
 
 				if (!durationResponse.ok || durationData.error) {
 						console.error('Error fetching video durations:', durationData.error || durationResponse.statusText);
@@ -271,7 +272,8 @@
 				const durationsMap = Object.fromEntries(
 						durationData.items.map(item => [item.id, item.contentDetails.duration])
 				);
-				console.log('Durations map:', durationsMap);
+				// debugging
+				// console.log('Durations map:', durationsMap);
 				videos = videos.map(video => ({
 						...video,
 						durationReadable: parseDuration(durationsMap[video.videoId] || 'PT0S'), // Parse ISO 8601 duration || Default to 'PT0S' if duration is missing
@@ -447,7 +449,7 @@
 								<p class="date">${video.publishedAtF}</p>
 							</div>
 					<span class="index-display">${index + 1}/${totalVideos}</span>
-					<span class="duration-display">${video.durationReadable}</span>
+					<span class="duration-display">${video.durationReadable || 'N/A'}</span>
 						</a>
 					</li>`
 				)
@@ -468,6 +470,8 @@
 					updateControlButtons();
 				});
 			});
+			// debugging
+			// console.log(videos);
 		}
 
 
