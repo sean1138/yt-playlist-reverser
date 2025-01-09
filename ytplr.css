@@ -22,16 +22,6 @@ input[type="text" i], option {
     padding-block-start: 0;
     padding-block-end: 0;
 }
-select, input[type="text" i]{
-	padding: .25em .5em;
-}
-input, button, option{
-	padding: .5em .75em;
-}
-input[type="text" i]{
-	padding-left: .75em;
-	padding-right: .75em;
-}
 button,input{overflow:visible}
 button,select{text-transform:none}
 [type=button],[type=reset],[type=submit],button{-webkit-appearance:button}
@@ -181,7 +171,7 @@ INPUT[type="radio"]{margin:0;padding:0;border:0;background-color:transparent;}
 INPUT[type="checkbox"] { vertical-align: bottom; *vertical-align: baseline; }*/
 .ie6 INPUT{ vertical-align: text-bottom; }
 /* hand cursor on clickable input elements */
-label, input[type=button], input[type=submit], button { cursor: pointer;}
+label, input[type=button]:not(:disabled), input[type=submit]:not(:disabled), button:not(:disabled) { cursor: pointer;}
 input[type=button], input[type=submit], button{white-space:nowrap;}/*buttons with multiple lines look dumb and usually wrong*/
 /*** end FORM elements ***/
 /*** start links ***/
@@ -233,6 +223,10 @@ body {
 	--background1:hsl(0,4%,12%);
 	--background2:hsl(0,60%,4%);
 	--scroller:hsl(24,8%,30%);
+	--btnbgA:hsl(24,8%,20%);
+	--btnbg:hsl(24,8%,15%);
+	--btnbd:hsl(24,8%,0%);
+	--btnbdA:hsl(24,8%,50%);
 	--br: .25rem;
 	color: var(--foreground1);
 /*	background: var(--background1);*/
@@ -254,17 +248,28 @@ IFRAME{
 	aspect-ratio: 16 / 10;
 	border-radius: var(--br);
 }
+select, input[type="text" i]{
+	padding: .25em .5em;
+}
+input, button, option{
+	padding: .5em .75em;
+}
+input[type="text" i]{
+	padding-left: .75em;
+	padding-right: .75em;
+}
 input, select, button{
-	border: 1px solid var(--black);
+	border: 1px solid var(--btnbd);
 	border-radius: var(--br);
-	background-color: var(--foreground1);
-	color: var(--background1);
+	background-color: var(--btnbg);
+	color: var(--foreground1);
 }
 button{
 	text-transform: capitalize;
 }
-button:hover, button:focus-visible, input:focus-visible, select:focus-visible{
-	background-color:var(--foreground1l);
+button:not(:disabled):hover, button:focus-visible, input:focus-visible, select:focus-visible{
+	background-color:var(--btnbgA);
+	border-color:var(--btnbdA);
 }
 button img{
 	height: 1.25rem;

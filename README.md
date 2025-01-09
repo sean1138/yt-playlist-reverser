@@ -2,7 +2,7 @@
 
 A web-based tool that allows users to load YouTube playlists and change the playback order. This tool sorts the playlist videos by upload date, video title, and duration.
 
-![page screenshot](ytplr-screenshot.jpg)
+![page screenshot ](ytplr-screenshot.jpg)
 
 ## Features
 
