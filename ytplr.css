@@ -171,7 +171,7 @@ INPUT[type="radio"]{margin:0;padding:0;border:0;background-color:transparent;}
 INPUT[type="checkbox"] { vertical-align: bottom; *vertical-align: baseline; }*/
 .ie6 INPUT{ vertical-align: text-bottom; }
 /* hand cursor on clickable input elements */
-label, input[type=button]:not(:disabled), input[type=submit]:not(:disabled), button:not(:disabled) { cursor: pointer;}
+label, input[type=button]:not(:disabled), input[type=submit]:not(:disabled), button:not(:disabled), select, option { cursor: pointer;}
 input[type=button], input[type=submit], button{white-space:nowrap;}/*buttons with multiple lines look dumb and usually wrong*/
 /*** end FORM elements ***/
 /*** start links ***/
@@ -267,7 +267,7 @@ input, select, button{
 button{
 	text-transform: capitalize;
 }
-button:not(:disabled):hover, button:focus-visible, input:focus-visible, select:focus-visible{
+button:not(:disabled):hover, button:focus-visible, input:focus-visible, select:focus-visible, select:hover{
 	background-color:var(--btnbgA);
 	border-color:var(--btnbdA);
 }
