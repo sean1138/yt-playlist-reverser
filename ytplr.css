@@ -109,7 +109,7 @@ footer{
 /* this choice of font-family is supposed to render text the same across platforms
  * letter-spacing makes the font a bit more legible
  */
-body, input, button, textarea, select {font-family: "Lucida Sans Unicode","Lucida Grande","Lucida Sans",Verdana,Arial, sans-serif; letter-spacing:1px;}
+body, input, button, textarea, select {font-family: "Lucida Sans Unicode","Lucida Grande","Lucida Sans",Verdana,Arial, sans-serif; /*letter-spacing:1px;*/}
 h1, h2, h3, h4, h5, h6 {font-family: Georgia, "DejaVu Serif", serif; letter-spacing: 1px;}
 pre, tt, code, kbd, samp, var {font-family: "Courier New", Courier, monospace;}
 /* avoid browser default inconsistent heading font-sizes - and pre/code/kbd too */
