@@ -15,12 +15,22 @@ sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}
 sub{bottom:-.25em}
 sup{top:-.5em}
 img{border-style:none}
-button,input,optgroup,select,textarea, option{font-family:inherit;font-size:100%;line-height:1;margin:0}
+button,input,optgroup,select,textarea, option{font-family:inherit;font-size:1rem;line-height:1;margin:0}
 input[type="text" i], option {
     padding-block: 0;
     padding-inline: 0;
     padding-block-start: 0;
     padding-block-end: 0;
+}
+select, input[type="text" i]{
+	padding: .25em .5em;
+}
+input, button, option{
+	padding: .5em .75em;
+}
+input[type="text" i]{
+	padding-left: .75em;
+	padding-right: .75em;
 }
 button,input{overflow:visible}
 button,select{text-transform:none}
@@ -99,7 +109,7 @@ footer{
 /* this choice of font-family is supposed to render text the same across platforms
  * letter-spacing makes the font a bit more legible
  */
-body, input, button, textarea, select {font-family: "Lucida Sans Unicode","Lucida Grande","Lucida Sans",Verdana,Arial, sans-serif; /*letter-spacing:1px;*/}
+body, input, button, textarea, select {font-family: "Lucida Sans Unicode","Lucida Grande","Lucida Sans",Verdana,Arial, sans-serif; letter-spacing:1px;}
 h1, h2, h3, h4, h5, h6 {font-family: Georgia, "DejaVu Serif", serif; letter-spacing: 1px;}
 pre, tt, code, kbd, samp, var {font-family: "Courier New", Courier, monospace;}
 /* avoid browser default inconsistent heading font-sizes - and pre/code/kbd too */
@@ -245,7 +255,6 @@ IFRAME{
 	border-radius: var(--br);
 }
 input, select, button{
-	padding: .25em .5em;
 	border: 1px solid var(--black);
 	border-radius: var(--br);
 	background-color: var(--foreground1);
@@ -258,8 +267,11 @@ button:hover, button:focus-visible, input:focus-visible, select:focus-visible{
 	background-color:var(--foreground1l);
 }
 button img{
-	height: 1.5rem;
+	height: 1.25rem;
 	width: auto;
+}
+button:has(img) {
+	padding: .5em;
 }
 .controls{
 	width: 100%;
