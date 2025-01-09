@@ -375,6 +375,7 @@ main ul span{
 	font-size: .75em;
 	line-height: 1;
 	background: var(--background2);
+	color: var(--foreground1);
 	border-radius: var(--br);
 	border-bottom-left-radius: initial;
 	border-bottom-right-radius: initial;
