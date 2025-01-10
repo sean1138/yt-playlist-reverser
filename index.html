@@ -156,21 +156,21 @@
 
 		// Function to update video description
 		function updateDescrip() {
-	    const descriptionDiv = document.querySelector('.description');
-	    descriptionDiv.style.display = "block";
-	    if (descriptionDiv && videoQueue[currentIndex].description) {
-        const descriptionText = videoQueue[currentIndex].description;
-        // Use a regular expression to find URLs
-        const urlRegex = /(https?:\/\/[^\s]+)/g;
-        // Replace URLs with clickable links
-        const descriptionWithLinks = descriptionText.replace(urlRegex, (url) => {
-            return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-        });
-        // Set the innerHTML to allow clickable links
-        descriptionDiv.innerHTML = descriptionWithLinks;
-	    } else {
-	      descriptionDiv.textContent = 'No description found!';
-	    }
+			const descriptionDiv = document.querySelector('.description');
+			descriptionDiv.style.display = "block";
+			if (descriptionDiv && videoQueue[currentIndex].description) {
+				const descriptionText = videoQueue[currentIndex].description;
+				// Use a regular expression to find URLs
+				const urlRegex = /(https?:\/\/[^\s]+)/g;
+				// Replace URLs with clickable links
+				const descriptionWithLinks = descriptionText.replace(urlRegex, (url) => {
+					return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+				});
+				// Set the innerHTML to allow clickable links
+				descriptionDiv.innerHTML = descriptionWithLinks;
+			} else {
+				descriptionDiv.textContent = 'No description found!';
+			}
 		}
 
 
@@ -207,12 +207,12 @@
 					generatePlaylistLinks(videoQueue, playlistId);
 
 					if (videoId && !isNaN(index)) {
-							currentIndex = index; // Set the current index based on the URL parameter
-							playVideo(videoQueue[currentIndex].videoId, playlistId, currentIndex); // Play the specified video
+						currentIndex = index; // Set the current index based on the URL parameter
+						playVideo(videoQueue[currentIndex].videoId, playlistId, currentIndex); // Play the specified video
 					} else {
-							// If no specific video is provided, play the first video by default
-							currentIndex = 0;
-							playVideo(videoQueue[currentIndex].videoId, playlistId, currentIndex);
+						// If no specific video is provided, play the first video by default
+						currentIndex = 0;
+						playVideo(videoQueue[currentIndex].videoId, playlistId, currentIndex);
 					}
 					updateControlButtons(); // Update button states after loading
 				});
@@ -229,10 +229,10 @@
 					const text = await response.text(); // Get raw response text
 					let data;
 					try {
-					    data = JSON.parse(text); // Parse the JSON response
+						data = JSON.parse(text); // Parse the JSON response
 					} catch (parseError) {
-					    console.error('Failed to parse JSON:', parseError, text);
-					    throw new Error('Invalid JSON response from server');
+						console.error('Failed to parse JSON:', parseError, text);
+						throw new Error('Invalid JSON response from server');
 					}
 
 					if (!response.ok || data.error) {
@@ -256,8 +256,8 @@
 					nextPageToken = data.nextPageToken || '';
 				} while (nextPageToken);
 				if (videos.length === 0) {
-				    console.warn('No videos found in playlist');
-				    return videos;
+					console.warn('No videos found in playlist');
+					return videos;
 				}
 				// Fetch video durations in bulk
 				const videoIds = videos.map(video => video.videoId).join(',');
@@ -268,25 +268,25 @@
 				// console.log('Duration API response:', durationData);
 
 				if (!durationResponse.ok || durationData.error) {
-						console.error('Error fetching video durations:', durationData.error || durationResponse.statusText);
-						throw new Error('Failed to fetch video durations');
+					console.error('Error fetching video durations:', durationData.error || durationResponse.statusText);
+					throw new Error('Failed to fetch video durations');
 				}
 
 				// Add a check for durationData.items:
 				if (!durationData.items || !Array.isArray(durationData.items)) {
-				    console.error('Invalid duration data:', durationData);
-				    throw new Error('No valid duration items returned from the API');
+					console.error('Invalid duration data:', durationData);
+					throw new Error('No valid duration items returned from the API');
 				}
 
 				const durationsMap = Object.fromEntries(
-						durationData.items.map(item => [item.id, item.contentDetails.duration])
+					durationData.items.map(item => [item.id, item.contentDetails.duration])
 				);
 				// debugging
 				// console.log('Durations map:', durationsMap);
 				videos = videos.map(video => ({
-						...video,
-						durationReadable: parseDuration(durationsMap[video.videoId] || 'PT0S'), // Parse ISO 8601 duration || Default to 'PT0S' if duration is missing
-						duration: parseISODuration(durationsMap[video.videoId] || 'PT0S'), // Parse ISO 8601 duration to seconds || Default to 'PT0S' if duration is missing
+					...video,
+					durationReadable: parseDuration(durationsMap[video.videoId] || 'PT0S'), // Parse ISO 8601 duration || Default to 'PT0S' if duration is missing
+					duration: parseISODuration(durationsMap[video.videoId] || 'PT0S'), // Parse ISO 8601 duration to seconds || Default to 'PT0S' if duration is missing
 				}));
 
 				// get mpaa ratings?
@@ -317,9 +317,9 @@
 			// Match duration components (hours, minutes, seconds)
 			const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
 			if (!match) {
-			        console.warn('Invalid ISO duration format:', duration);
-			        return "0:00"; // Default to "0:00" if the duration is invalid
-			    }
+							console.warn('Invalid ISO duration format:', duration);
+							return "0:00"; // Default to "0:00" if the duration is invalid
+					}
 
 			const hours = parseInt(match[1] || 0, 10); // Hours
 			const minutes = parseInt(match[2] || 0, 10); // Minutes
@@ -335,34 +335,34 @@
 		}
 		// Function to parse ISO 8601 duration strings into seconds
 		function parseISODuration(duration) {
-				const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-				if (!match) {
-				        console.warn('Invalid ISO duration format:', duration);
-				        return 0;
-				    }
+			const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+			if (!match) {
+							console.warn('Invalid ISO duration format:', duration);
+							return 0;
+					}
 
-				const hours = parseInt(match[1] || 0, 10);
-				const minutes = parseInt(match[2] || 0, 10);
-				const seconds = parseInt(match[3] || 0, 10);
+			const hours = parseInt(match[1] || 0, 10);
+			const minutes = parseInt(match[2] || 0, 10);
+			const seconds = parseInt(match[3] || 0, 10);
 
-				return hours * 3600 + minutes * 60 + seconds; // Return total duration in seconds
+			return hours * 3600 + minutes * 60 + seconds; // Return total duration in seconds
 		}
 
 		// Helper Function to Format the Date
 		function formatPublishedDate(publishedAt) {
-				const date = new Date(publishedAt);
+			const date = new Date(publishedAt);
 
-				// Extract individual components
-				const dayOfWeek = date.toLocaleString('en-US', { weekday: 'short' }); // e.g., "Mon"
-				const year = date.getFullYear(); // e.g., 2020
-				const month = String(date.getMonth() + 1).padStart(2, '0'); // e.g., "02"
-				const day = String(date.getDate()).padStart(2, '0'); // e.g., "24"
-				const time = date.toTimeString().split(' ')[0]; // e.g., "12:08:06"
-				const timezone = date.toTimeString().split(' ')[1]; // e.g., "GMT-0500 (Eastern Standard Time)"
+			// Extract individual components
+			const dayOfWeek = date.toLocaleString('en-US', { weekday: 'short' }); // e.g., "Mon"
+			const year = date.getFullYear(); // e.g., 2020
+			const month = String(date.getMonth() + 1).padStart(2, '0'); // e.g., "02"
+			const day = String(date.getDate()).padStart(2, '0'); // e.g., "24"
+			const time = date.toTimeString().split(' ')[0]; // e.g., "12:08:06"
+			const timezone = date.toTimeString().split(' ')[1]; // e.g., "GMT-0500 (Eastern Standard Time)"
 
-				// Format as: Mon 2020.02.24 12:08:06 GMT-0500 (EST)
-				const timezoneAbbreviation = timezone.match(/\(([^)]+)\)/)?.[1]?.split(' ')?.map(w => w[0])?.join('') || timezone;
-				return `${year}.${month}.${day} (${dayOfWeek}) ${time} GMT${timezone.split(' ')[0].replace('GMT', '')} (${timezoneAbbreviation})`;
+			// Format as: Mon 2020.02.24 12:08:06 GMT-0500 (EST)
+			const timezoneAbbreviation = timezone.match(/\(([^)]+)\)/)?.[1]?.split(' ')?.map(w => w[0])?.join('') || timezone;
+			return `${year}.${month}.${day} (${dayOfWeek}) ${time} GMT${timezone.split(' ')[0].replace('GMT', '')} (${timezoneAbbreviation})`;
 		}
 
 
@@ -406,11 +406,11 @@
 		}
 		// Randomize playlist and regenerate links
 		function randomizePlaylist() {
-				const shuffledVideos = shuffleArray(videoQueue.slice()); // Clone and shuffle the playlist
-				generatePlaylistLinks(shuffledVideos, playlistId); // Regenerate playlist links
-				currentIndex = 0; // Reset to the first video
-				playVideo(shuffledVideos[currentIndex].videoId, playlistId, currentIndex); // Play the first video in the shuffled playlist
-				updateControlButtons(); // Update next/previous buttons
+			const shuffledVideos = shuffleArray(videoQueue.slice()); // Clone and shuffle the playlist
+			generatePlaylistLinks(shuffledVideos, playlistId); // Regenerate playlist links
+			currentIndex = 0; // Reset to the first video
+			playVideo(shuffledVideos[currentIndex].videoId, playlistId, currentIndex); // Play the first video in the shuffled playlist
+			updateControlButtons(); // Update next/previous buttons
 		}
 		// Add event listener to the randomize button
 		document.getElementById('randomizePlaylist').addEventListener('click', randomizePlaylist);
@@ -434,7 +434,9 @@
 				currentIndex++;
 				if (currentIndex < videoQueue.length) {
 					const nextVideo = videoQueue[currentIndex];
-					playVideo(nextVideo.videoId, null, currentIndex); // Play the next video
+					const playlistId = new URLSearchParams(window.location.search).get('list'); // Get the playlist ID from the URL
+					playVideo(nextVideo.videoId, playlistId, currentIndex); // Pass the correct playlist ID & play the next video
+
 				} else {
 					alert('Playlist finished!');
 				}
@@ -497,42 +499,44 @@
 
 		// Scroll to the current video (button)
 		document.getElementById('scrollToCurrent').addEventListener('click', () => {
-				const currentLink = document.querySelector('#playlist a.current-video');
-				if (currentLink) {
-						currentLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
-				} else {
-						alert('No current video selected!');
-				}
+			const currentLink = document.querySelector('#playlist a.current-video');
+			if (currentLink) {
+				currentLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			} else {
+				alert('No current video selected!');
+			}
 		});
 
 		// Function to play the previous video
 		function playPreviousVideo() {
-				if (currentIndex > 0) {
-						currentIndex--; // Move to the previous video
-						const previousVideoId = videoQueue[currentIndex].videoId;
-						playVideo(previousVideoId, null, currentIndex); // Play the previous video
-				}
-				updateControlButtons(); // Update button states
+			if (currentIndex > 0) {
+				currentIndex--; // Move to the previous video
+				const previousVideoId = videoQueue[currentIndex].videoId;
+				const playlistId = new URLSearchParams(window.location.search).get('list'); // Get the playlist ID from the URL
+				playVideo(previousVideoId, playlistId, currentIndex); // Pass the correct playlist ID & play the prev video
+			}
+			updateControlButtons(); // Update button states
 		}
 
 		// Function to play the next video
 		function playNextVideo() {
-				if (currentIndex < videoQueue.length - 1) {
-						currentIndex++; // Move to the next video
-						const nextVideoId = videoQueue[currentIndex].videoId;
-						playVideo(nextVideoId, null, currentIndex); // Play the next video
-				}
-				updateControlButtons(); // Update button states
+			if (currentIndex < videoQueue.length - 1) {
+				currentIndex++; // Move to the next video
+				const nextVideoId = videoQueue[currentIndex].videoId;
+				const playlistId = new URLSearchParams(window.location.search).get('list'); // Get the playlist ID from the URL
+				playVideo(nextVideoId, playlistId, currentIndex); // Pass the correct playlist ID & play the next video
+			}
+			updateControlButtons(); // Update button states
 		}
 
 		// Function to update prev/next button states (disable/enable)
 		function updateControlButtons() {
-				const prevButton = document.getElementById('prevVideo');
-				const nextButton = document.getElementById('nextVideo');
+			const prevButton = document.getElementById('prevVideo');
+			const nextButton = document.getElementById('nextVideo');
 
-				// Disable or enable buttons based on currentIndex
-				prevButton.disabled = currentIndex === 0; // Disable if no previous video
-				nextButton.disabled = currentIndex === videoQueue.length - 1; // Disable if no next video
+			// Disable or enable buttons based on currentIndex
+			prevButton.disabled = currentIndex === 0; // Disable if no previous video
+			nextButton.disabled = currentIndex === videoQueue.length - 1; // Disable if no next video
 		}
 
 		// Add event listeners for the pev/next buttons
