@@ -225,7 +225,9 @@ body {
 	--scroller:hsl(24,8%,30%);
 	--btnbgA:hsl(24,8%,20%);
 	--btnbg:hsl(24,8%,15%);
-	--btnbd:hsl(24,8%,0%);
+	--btnbgGA:linear-gradient(180deg, hsl(24, 8%, 17%) 0%, hsl(24, 8%, 12%) 100%);
+	--btnbgG:linear-gradient(180deg, hsl(24, 8%, 15%) 0%, hsl(24, 8%, 10%) 100%);
+	--btnbd:hsl(24,8%,25%);
 	--btnbdA:hsl(24,8%,50%);
 	--br: .25rem;
 	color: var(--foreground1);
@@ -257,19 +259,27 @@ input, button, option{
 input[type="text" i]{
 	padding-left: .75em;
 	padding-right: .75em;
+	background: var(--btnbg);
 }
 input, select, button{
 	border: 1px solid var(--btnbd);
 	border-radius: var(--br);
-	background-color: var(--btnbg);
+	background: var(--btnbgG);
 	color: var(--foreground1);
 }
+option{
+	color: var(--black);
+}
+option:hover{cursor:pointer}
 button{
 	text-transform: capitalize;
 }
 button:not(:disabled):hover, button:focus-visible, input:focus-visible, select:focus-visible, select:hover{
-	background-color:var(--btnbgA);
+	background:var(--btnbgGA);
 	border-color:var(--btnbdA);
+}
+button[disabled]{
+	opacity: 0.25;
 }
 button img{
 	height: 1.25rem;
