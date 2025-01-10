@@ -438,7 +438,10 @@
 					playVideo(nextVideo.videoId, playlistId, currentIndex); // Pass the correct playlist ID & play the next video
 
 				} else {
-					alert('Playlist finished!');
+					// loop back to first video in list once we reach the end of the playlist
+					currentIndex = 0;
+					playVideo(videoQueue[currentIndex].videoId, playlistId, currentIndex);
+					// alert('Playlist finished!');
 				}
 			}
 			// Update the description div with the current video's description
