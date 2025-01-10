@@ -154,16 +154,25 @@
 		let currentIndex = 0;
 		let playlistId = ''; // Declare a global variable for playlistId
 
-		// function to update video description
-		function updateDescrip(){
-			const descriptionDiv = document.querySelector('.description');
-			descriptionDiv.style.display = "block";
-			if (descriptionDiv && videoQueue[currentIndex].description) {
-				descriptionDiv.textContent = videoQueue[currentIndex].description; // Set the description text
-			} else {
-				descriptionDiv.textContent = 'No description found!';
-			}
+		// Function to update video description
+		function updateDescrip() {
+	    const descriptionDiv = document.querySelector('.description');
+	    descriptionDiv.style.display = "block";
+	    if (descriptionDiv && videoQueue[currentIndex].description) {
+        const descriptionText = videoQueue[currentIndex].description;
+        // Use a regular expression to find URLs
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        // Replace URLs with clickable links
+        const descriptionWithLinks = descriptionText.replace(urlRegex, (url) => {
+            return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+        });
+        // Set the innerHTML to allow clickable links
+        descriptionDiv.innerHTML = descriptionWithLinks;
+	    } else {
+	      descriptionDiv.textContent = 'No description found!';
+	    }
 		}
+
 
 		// Function to load a video by ID and update the player and URL
 		function playVideo(videoId, playlistId, index) {
