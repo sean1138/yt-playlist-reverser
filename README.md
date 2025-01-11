@@ -7,12 +7,13 @@ A web-based tool that allows users to load YouTube playlists and change the play
 ## Features
 
 - **Custom Sorting Options:**
-  - Oldest First [Default].
-  - Newest First.
-  - A-Z.
-  - Z-A.
-  - Shortest First.
-  - Longest First.
+	- Oldest First.
+	- Newest First.
+	- A-Z.
+	- Z-A.
+	- Shortest First.
+	- Longest First.
+	- Most/Least viewed
  - **Randomize Button:** Shuffles the playlist order with every press.
 - **Video Description Display:** Displays the description of the currently playing video.
 - **Scroll to Current Video:** Automatically scrolls the current video in the playlist into view, with button to manually scroll to it as well.
@@ -22,34 +23,37 @@ A web-based tool that allows users to load YouTube playlists and change the play
 ## Installation
 
 1. Clone the repository or download the source code.
-   ```bash
-   git clone https://github.com/sean1138/yt-playlist-reverser.git
-   ```
+	 ```bash
+	 git clone https://github.com/sean1138/yt-playlist-reverser.git
+	 ```
 
 2. Set up a local web server (e.g., Apache, Nginx, whatever). Place the project files in the server's document root.
 
 3. Obtain a YouTube Data API v3 key:
-   - Go to the [Google Cloud Console](https://console.cloud.google.com/).
-   - Create a new project or select an existing one.
-   - Enable the YouTube Data API v3 for your project.
-   - Create an API key and note it down.
+	 - Go to the [Google Cloud Console](https://console.cloud.google.com/).
+	 - Create a new project or select an existing one.
+	 - Enable the YouTube Data API v3 for your project.
+	 - Create an API key and note it down.
 
 4. Configure the API key:
-   - Replace `EXAMPLEKEY` in the `ytplr-EXAMPLE.php` file with your actual API key and remove `-EXAMPLE` from the filename.
+	 - Replace `EXAMPLEKEY` in the `ytplr-EXAMPLE.php` file with your actual API key and remove `-EXAMPLE` from the filename.
 
 5. Start the web server and navigate to the project in your browser:
-   ```
-   http://localhost/yt-playlist-reverser/
-   ```
+	 ```
+	 http://localhost/yt-playlist-reverser/
+	 ```
 
 ## Usage
 
 1. Paste a YouTube playlist URL into the text input box and click "Load Playlist" button or hit the enter key.
 2. Use the dropdown menu to select your desired playback order:
-   - Oldest First [Default].
-   - Newest First.
-   - A-Z.
-   - Z-A.
+	 - Oldest First.
+	 - Newest First.
+	 - A-Z.
+	 - Z-A.
+	 - Shortest First.
+	 - Longest First.
+	 - Most/Least viewed
 3. Click on any video in the playlist to start playback.
 4. Use the Next/Previous buttons to navigate through the playlist.
 5. Click the "Scroll to Current Video" button to quickly bring the currently playing video into view within the playlist if you've scrolled away from it.

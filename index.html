@@ -28,6 +28,8 @@
 					<option value="titleDesc">Z-A</option>
 					<option value="durationAsc">Shortest First</option>
 					<option value="durationDesc">Longest First</option>
+					<option value="mostViewed">Most Viewed</option>
+					<option value="leastViewed">Least Viewed</option>
 				</select>
 				<button id="randomizePlaylist" type="button" title="Randomize Playlist"><img src="svgrepo-com-dice-6-min.svg" alt="dice icon"></button>
 			</div>
@@ -174,14 +176,17 @@
 			}
 		}
 
-
 		// Function to load a video by ID and update the player and URL
 		function playVideo(videoId, playlistId, index) {
 			currentIndex = index; // Update the current index
-
+			// Get the current sortOrder from the URL
+			const params = new URLSearchParams(window.location.search);
+			const sortOrder = params.get('sortOrder') || "reverse";
 			// Update URL without reloading the page
-			const newUrl = `${window.location.pathname}?v=${videoId}&list=${playlistId}&index=${index}`;
-			window.history.pushState({}, '', newUrl);
+			const newUrl = `${window.location.pathname}?v=${videoId}&list=${playlistId}&sortOrder=${sortOrder}&index=${index}`;
+					window.history.pushState({}, '', newUrl);
+			const playerDiv = document.getElementById("playerContainer");
+			playerDiv.classList.add("loaded");
 
 			// Load the video in the player
 			if (player) {
@@ -196,11 +201,48 @@
 		}
 
 		// On page load, parse URL parameters and load the corresponding video
-		function handleInitialLoad() {
+		async function handleInitialLoad() {
 			const params = new URLSearchParams(window.location.search);
 			const videoId = params.get('v');
 			const playlistId = params.get('list');
-			const index = parseInt(params.get('index'), 10);
+			const sortOrder = params.get('sortOrder') || "reverse"; // Default to "reverse" if no sortOrder is specified
+			const index = parseInt(params.get('index'), 10) || 0; // Default to 0 if index is not valid
+			// Fetch the playlist videos (if not already populated)
+			if (!videoQueue || videoQueue.length === 0) {
+				try {
+					videoQueue = await fetchPlaylistVideos(playlistId); // Ensure videoQueue is populated
+				} catch (error) {
+					console.error("Failed to fetch playlist videos:", error);
+					alert("Could not load playlist videos.");
+					return;
+				}
+			}
+			// Sort the playlist based on the sortOrder on page load
+			videoQueue = sortPlaylist(videoQueue, sortOrder);
+			// Update the dropdown to reflect the current sortOrder on page load
+			document.getElementById('sortOrder').value = sortOrder;
+			// Generate links and play the first video in the sorted order
+			generatePlaylistLinks(videoQueue, playlistId);
+			// Update currentIndex safely
+			if (index >= 0 && index < videoQueue.length) {
+				currentIndex = index;
+			} else {
+				console.warn(`Invalid index (${index}), defaulting to 0.`);
+				currentIndex = 0;
+			}
+			// playVideo(videoQueue[currentIndex].videoId, playlistId, currentIndex);
+			// Play the video at the current index
+			if (videoQueue && videoQueue.length > 0 && currentIndex >= 0 && currentIndex < videoQueue.length) {
+				const currentVideo = videoQueue[currentIndex];
+				playVideo(currentVideo.videoId, playlistId, currentIndex);
+			} else {
+				console.error("No valid video found at current index.");
+				const videoPlayerContainer = document.getElementById('video-player-container');
+				if (videoPlayerContainer) {
+					videoPlayerContainer.innerHTML = `<p>No video available to play. Please check the playlist or URL.</p>`;
+				}
+			}
+
 
 			if (playlistId) {
 				fetchPlaylistVideos(playlistId).then((videos) => {
@@ -280,14 +322,19 @@
 				}
 
 				const durationsMap = Object.fromEntries(
-					durationData.items.map(item => [item.id, item.contentDetails.duration])
+					durationData.items.map(item => [item.id, {
+						duration: item.contentDetails.duration,
+						viewCount: parseInt(item.statistics?.viewCount || "0", 10) // Default to 0 if viewCount is unavailable
+					}])
 				);
 				// debugging
 				// console.log('Durations map:', durationsMap);
+				// Map view counts to the videos
 				videos = videos.map(video => ({
 					...video,
-					durationReadable: parseDuration(durationsMap[video.videoId] || 'PT0S'), // Parse ISO 8601 duration || Default to 'PT0S' if duration is missing
-					duration: parseISODuration(durationsMap[video.videoId] || 'PT0S'), // Parse ISO 8601 duration to seconds || Default to 'PT0S' if duration is missing
+					durationReadable: parseDuration(durationsMap[video.videoId]?.duration || 'hh:mm:ss'), // Parse duration for readable text || Default to 'hh:mm:ss' if duration is missing
+					duration: parseISODuration(durationsMap[video.videoId]?.duration || 'PT0S'), // Parse ISO 8601 duration to seconds || Default to 'PT0S' if duration is missing
+					viewCount: durationsMap[video.videoId]?.viewCount || 0 // Add viewCount to video data
 				}));
 
 				// get mpaa ratings?
@@ -382,6 +429,10 @@
 					return videos.sort((a, b) => a.duration - b.duration); // Shortest first
 				case "durationDesc":
 					return videos.sort((a, b) => b.duration - a.duration); // Longest first
+				case "mostViewed":
+					return videos.sort((a, b) => b.viewCount - a.viewCount); // Most Viewed first
+				case "leastViewed":
+					return videos.sort((a, b) => a.viewCount - b.viewCount); // Least Viewed first
 				default:
 					return videos.reverse(); // Default: reverse order
 			}
@@ -391,6 +442,14 @@
 		// Add event listener for sorting dropdown
 		document.getElementById('sortOrder').addEventListener('change', () => {
 			const sortOrder = document.getElementById('sortOrder').value;
+
+			// Update URL with sortOrder
+			const params = new URLSearchParams(window.location.search);
+			params.set('sortOrder', sortOrder);
+			const newUrl = `${window.location.pathname}?${params.toString()}`;
+			window.history.pushState({}, '', newUrl);
+
+			// Sort and update the playlist
 			const sortedVideos = sortPlaylist(videoQueue.slice(), sortOrder); // Clone the array before sorting
 			generatePlaylistLinks(sortedVideos, playlistId); // Regenerate playlist links
 			currentIndex = 0; // Reset to the first video
@@ -462,6 +521,7 @@
 							<div>
 								<p class="title">${video.title}</p>
 								<p class="date">${video.publishedAtF}</p>
+								<p class="date">${video.viewCount.toLocaleString()} Views</p>
 							</div>
 					<span class="index-display">${index + 1}/${totalVideos}</span>
 					<span class="duration-display">${video.durationReadable || 'N/A'}</span>
