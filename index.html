@@ -190,7 +190,7 @@
 			currentIndex = index; // Update the current index
 			// Get the current sortOrder from the URL
 			const params = new URLSearchParams(window.location.search);
-			const sortOrder = params.get('sortOrder') || "reverse";
+			const sortOrder = params.get('sortOrder') || "default";
 			// Update URL without reloading the page
 			const newUrl = `${window.location.pathname}?v=${videoId}&list=${playlistId}&sortOrder=${sortOrder}&index=${index}`;
 			window.history.pushState({}, '', newUrl);
@@ -214,7 +214,7 @@
 			const params = new URLSearchParams(window.location.search);
 			const videoId = params.get('v');
 			const playlistId = params.get('list');
-			const sortOrder = params.get('sortOrder') || "reverse"; // Default to "reverse" if no sortOrder is specified
+			const sortOrder = params.get('sortOrder') || "default"; // Don't Default to "reverse" if no sortOrder is specified
 			const index = parseInt(params.get('index'), 10) || 0; // Default to 0 if index is not valid
 			// Fetch the playlist videos (if not already populated)
 			if (!videoQueue || videoQueue.length === 0) {
