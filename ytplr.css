@@ -379,7 +379,7 @@ main ul p{
 	margin: 0;
 	width: 100%;
 }
-main ul .date{
+main ul :where(.date, .views){
 	font-size: .75em;
 }
 main ul span{

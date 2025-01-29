@@ -21,7 +21,7 @@
 			<div id="sortingOptions">
 				<label for="sortOrder">Sort Playlist By:</label>
 				<select id="sortOrder">
-					<option value="" selected>?</option>
+					<option value="default" selected>Default</option>
 					<option value="uploadOldest">Oldest First</option>
 					<option value="uploadNewest">Newest First</option>
 					<option value="titleAsc">A-Z</option>
@@ -73,8 +73,7 @@
 		</ol>
 		<button class="close-modal" data-modal-close>close</button>
 	</dialog>
-
-	<script>
+	<script class="ui-funcs">
 		// get current year
 		document.querySelector('.current-year').textContent = new Date().getFullYear();
 
@@ -149,8 +148,18 @@
 			window.location.reload();
 		});
 
-		//
-		//
+		// Scroll to the current video (button)
+		document.getElementById('scrollToCurrent').addEventListener('click', () => {
+			const currentLink = document.querySelector('#playlist a.current-video');
+			if (currentLink) {
+				currentLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			} else {
+				alert('No current video selected!');
+			}
+		});
+	</script>
+
+	<script class="logic-funcs">
 		// get stuff from youtube and do things with them
 		let player; // Global player variable
 		let videoQueue = [];
@@ -184,7 +193,7 @@
 			const sortOrder = params.get('sortOrder') || "reverse";
 			// Update URL without reloading the page
 			const newUrl = `${window.location.pathname}?v=${videoId}&list=${playlistId}&sortOrder=${sortOrder}&index=${index}`;
-					window.history.pushState({}, '', newUrl);
+			window.history.pushState({}, '', newUrl);
 			const playerDiv = document.getElementById("playerContainer");
 			playerDiv.classList.add("loaded");
 
@@ -242,7 +251,6 @@
 					videoPlayerContainer.innerHTML = `<p>No video available to play. Please check the playlist or URL.</p>`;
 				}
 			}
-
 
 			if (playlistId) {
 				fetchPlaylistVideos(playlistId).then((videos) => {
@@ -324,7 +332,7 @@
 				const durationsMap = Object.fromEntries(
 					durationData.items.map(item => [item.id, {
 						duration: item.contentDetails.duration,
-						viewCount: parseInt(item.statistics?.viewCount || "0", 10) // Default to 0 if viewCount is unavailable
+						viewCount: parseInt(item.statistics?.viewCount || "X", 10) // Default to X if viewCount is unavailable
 					}])
 				);
 				// debugging
@@ -336,28 +344,11 @@
 					duration: parseISODuration(durationsMap[video.videoId]?.duration || 'PT0S'), // Parse ISO 8601 duration to seconds || Default to 'PT0S' if duration is missing
 					viewCount: durationsMap[video.videoId]?.viewCount || 0 // Add viewCount to video data
 				}));
-
-				// get mpaa ratings?
-				// const mpaaResponse = await fetch(`ytplr.php?videoIds=${videoIds}`);
-				// const mpaaData = await mpaaResponse.json();
-				// const mpaaMap = Object.fromEntries(
-				// 		mpaaData.items.map(item => [item.id, item.contentDetails.contentRating.mpaaRating])
-				// );
-
-				// other interesting infos we could get
-				// etag
-				// contentDetails.licensedContent
-				// contentDetails.regionRestriction.allowed[]
-				// contentDetails.regionRestriction.blocked[]
-				// contentDetails.contentRating.tvpgRating
-				// statistics.viewCount
-				// statistics.likeCount
-				// statistics.dislikeCount
-
 			} catch (error) {
 				console.error('Error fetching playlist videos:', error);
 			}
-			return videos.reverse(); // Reverse the video order
+			// return videos.reverse(); // Reverse the video order
+			return videos; // DON'T Reverse the video order
 		}
 
 		// Function to parse ISO 8601 duration strings into readable format (e.g., "2:30" for 2 minutes and 30 seconds)
@@ -410,7 +401,9 @@
 
 			// Format as: Mon 2020.02.24 12:08:06 GMT-0500 (EST)
 			const timezoneAbbreviation = timezone.match(/\(([^)]+)\)/)?.[1]?.split(' ')?.map(w => w[0])?.join('') || timezone;
-			return `${year}.${month}.${day} (${dayOfWeek}) ${time} GMT${timezone.split(' ')[0].replace('GMT', '')} (${timezoneAbbreviation})`;
+			// return `${year}.${month}.${day} (${dayOfWeek}) ${time} GMT${timezone.split(' ')[0].replace('GMT', '')} (${timezoneAbbreviation})`;
+			// removed the timezone info
+			return `${year}.${month}.${day} (${dayOfWeek}) ${time}`;
 		}
 
 
@@ -434,7 +427,7 @@
 				case "leastViewed":
 					return videos.sort((a, b) => a.viewCount - b.viewCount); // Least Viewed first
 				default:
-					return videos.reverse(); // Default: reverse order
+					return videos; // Default: standard order
 			}
 			// Update the description div with the current video's description
 			updateDescrip();
@@ -513,22 +506,31 @@
 			const playlistContainer = document.getElementById('playlist');
 			const playlistControls = document.querySelector('.controls-playlist');
 			const totalVideos = videos.length; // Total number of videos
-			playlistContainer.innerHTML = videos
-				.map((video, index) =>
-					`<li>
-						<a href="#" data-index="${index}" data-video-id="${video.videoId}" class="${index === currentIndex ? 'current-video' : ''}">
-							<img src="${video.thumbnail}" alt="Thumbnail for ${video.title}" loading="lazy">
-							<div>
-								<p class="title">${video.title}</p>
-								<p class="date">${video.publishedAtF}</p>
-								<p class="date">${video.viewCount.toLocaleString()} Views</p>
-							</div>
-					<span class="index-display">${index + 1}/${totalVideos}</span>
-					<span class="duration-display">${video.durationReadable || 'N/A'}</span>
-						</a>
-					</li>`
-				)
-				.join('');
+			// Get the current sorting order from the select element
+		const sortOrder = document.getElementById('sortOrder').value;
+
+		playlistContainer.innerHTML = videos
+			.map((video, index) => {
+				// Conditionally include the viewCount line
+				const viewCountHTML =
+					sortOrder === 'mostViewed' || sortOrder === 'leastViewed'
+						? `<p class="views">${video.viewCount.toLocaleString()} Views</p>`
+						: '';
+
+				return `<li>
+					<a href="#" data-index="${index}" data-video-id="${video.videoId}" class="${index === currentIndex ? 'current-video' : ''}">
+						<img src="${video.thumbnail}" alt="Thumbnail for ${video.title}" loading="lazy">
+						<div>
+							<p class="title">${video.title}</p>
+							<p class="date">${video.publishedAtF}</p>
+							${viewCountHTML} <!-- Add the view count conditionally -->
+						</div>
+						<span class="index-display">${index + 1}/${totalVideos}</span>
+						<span class="duration-display">${video.durationReadable || 'N/A'}</span>
+					</a>
+				</li>`;
+			})
+			.join('');
 				playlistControls.style.display = "flex";
 
 			// Add click event listeners to links
@@ -549,7 +551,6 @@
 			// console.log(videos);
 		}
 
-
 		// Highlight the currently playing video in the list
 		function highlightCurrentVideo() {
 			const links = document.querySelectorAll('#playlist a');
@@ -560,16 +561,6 @@
 				currentLink.scrollIntoView({ behavior: 'smooth', block: 'center' }); // Scroll to the current video
 			}
 		}
-
-		// Scroll to the current video (button)
-		document.getElementById('scrollToCurrent').addEventListener('click', () => {
-			const currentLink = document.querySelector('#playlist a.current-video');
-			if (currentLink) {
-				currentLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
-			} else {
-				alert('No current video selected!');
-			}
-		});
 
 		// Function to play the previous video
 		function playPreviousVideo() {
@@ -630,7 +621,6 @@
 				}
 			});
 		}
-
 
 		// Add event listeners for button click and Enter key
 		document.getElementById('loadPlaylist').addEventListener('click', loadPlaylist);
